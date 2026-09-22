@@ -574,6 +574,32 @@ const tests: IntegrationTest[] = [
     },
   },
   {
+    name: 'same-panel save with source-spliced bytes succeeds',
+    run: async () => {
+      const initial = '# Splice Save\n\nOriginal content.\n'
+      const edited = '# Splice Save\n\nEdited content.\n'
+      const splicedEdit = '# Splice Save\n\nEdited content (spliced).\n'
+      const uri = await writeWorkspaceFile('same-panel-spliced-save.md', initial)
+      const document = await vscode.workspace.openTextDocument(uri)
+
+      await openHumanMarkdown(uri, vscode.ViewColumn.One)
+      await waitForSessionCount(uri, 1)
+      await clearWebviewMessages(uri, 0)
+
+      await sendWebviewMessage(uri, { type: 'edit', content: edited, revision: 1 }, 0)
+      await waitForDocumentText(document, edited)
+      await clearWebviewMessages(uri, 0)
+
+      await sendWebviewMessage(uri, { type: 'save', content: splicedEdit, requestId: 1 }, 0)
+      await waitForWebviewMessage(
+        uri,
+        (message) => message.type === 'save-success' && message.requestId === 1,
+        0,
+      )
+      assert.equal(document.getText(), splicedEdit)
+    },
+  },
+  {
     name: 'closing one panel does not break sync for the other',
     run: async () => {
       const uri = await writeWorkspaceFile(

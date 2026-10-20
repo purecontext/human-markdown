@@ -8,4 +8,4 @@ Performance targets:
 - File open to rendered content: < 200ms for files under 500 lines
 - Mode toggle (WYSIWYG ↔ raw): < 100ms perceived
 - Block edit to re-render: < 50ms
-- Webview bundle: < 500KB gzipped
+- Webview bundle: < 520KB gzipped

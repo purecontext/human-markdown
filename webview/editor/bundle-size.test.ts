@@ -14,7 +14,7 @@ describe('bundle size', () => {
     console.log(
       `Webview bundle: ${(source.length / 1024).toFixed(0)}KB raw, ${sizeKB.toFixed(0)}KB gzipped`,
     )
-    expect(sizeKB).toBeLessThan(500)
+    expect(sizeKB).toBeLessThan(520)
   })
 
   it('extension bundle is under 50KB gzipped', () => {

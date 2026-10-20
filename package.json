@@ -198,14 +198,14 @@
     "husky": "^9.0.0",
     "jsdom": "^29.1.1",
     "lint-staged": "^17.0.5",
-    "ovsx": "^1.0.0",
+    "ovsx": "^1.2.0",
     "remark-frontmatter": "^5.0.0",
     "remark-math": "^6.0.0",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
     "typescript": "^6.0.3",
     "unified": "^11.0.5",
-    "vite": "^6.4.3",
+    "vite": "^6.4.4",
     "vitest": "^4.1.8"
   },
   "dependencies": {
@@ -241,7 +241,18 @@
       "postcss@>=8.0.0 <8.5.18": ">=8.5.18",
       "nanoid@>=5.0.0 <5.1.16": ">=5.1.16",
       "brace-expansion@>=5.0.0 <5.0.9": ">=5.0.9",
-      "linkify-it@>=5.0.0 <5.0.2": ">=5.0.2"
+      "linkify-it@>=5.0.0 <5.0.2": ">=5.0.2",
+      "follow-redirects@>=1.16.0 <1.16.1": ">=1.16.1",
+      "markdown-it@>=14.1.0 <14.3.3": ">=14.3.3",
+      "source-map-js@>=1.0.0 <1.2.2": ">=1.2.2",
+      "@vue/server-renderer@<3.5.42": ">=3.5.42",
+      "prosemirror-view@<1.42.3": ">=1.42.3"
+    },
+    "auditConfig": {
+      "ignoreCves": [
+        "CVE-2026-65901",
+        "CVE-2026-93687"
+      ]
     }
   },
   "lint-staged": {

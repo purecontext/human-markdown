@@ -520,6 +520,7 @@ class DocumentSyncSession {
   private isSaving = false
   private baseContent: string
   private lastAppliedFromWebview: string | null = null
+  private lastAppliedSource: vscode.Webview | null = null
   private protectWebviewContentUntil = 0
   private holdNextEdit = false
   private heldWebviewEditStarted = false
@@ -568,6 +569,7 @@ class DocumentSyncSession {
     if (this.webviewIsDirty) return
     this.baseContent = this.document.getText()
     this.lastAppliedFromWebview = null
+    this.lastAppliedSource = null
   }
 
   setDirty(isDirty: boolean) {
@@ -643,6 +645,7 @@ class DocumentSyncSession {
     } else {
       this.baseContent = newContent
       this.lastAppliedFromWebview = null
+      this.lastAppliedSource = null
       this.broadcast({ type: 'update', content: newContent })
     }
   }
@@ -652,6 +655,7 @@ class DocumentSyncSession {
     const savedContent = this.document.getText()
     this.baseContent = savedContent
     this.lastAppliedFromWebview = savedContent
+    this.lastAppliedSource = null
     if (this.isSaving) return
     this.broadcast({ type: 'save-success' })
   }
@@ -687,6 +691,7 @@ class DocumentSyncSession {
       return true
     }
     this.lastAppliedFromWebview = content
+    this.lastAppliedSource = source ?? null
     this.suppressDocumentChange(content)
     const edit = new vscode.WorkspaceEdit()
     edit.replace(this.document.uri, this.fullDocumentRange(), content)
@@ -709,6 +714,7 @@ class DocumentSyncSession {
       if (diskContent === this.document.getText()) {
         this.baseContent = diskContent
         this.lastAppliedFromWebview = null
+        this.lastAppliedSource = null
         this.webviewIsDirty = false
         this.broadcast({ type: 'update', content: diskContent })
         return
@@ -720,6 +726,7 @@ class DocumentSyncSession {
       if (applied) {
         this.baseContent = diskContent
         this.lastAppliedFromWebview = null
+        this.lastAppliedSource = null
         this.webviewIsDirty = false
         this.broadcast({ type: 'update', content: diskContent })
       } else {
@@ -741,6 +748,7 @@ class DocumentSyncSession {
       this.isSaving = true
       const contentBeforeSave = this.document.getText()
       this.lastAppliedFromWebview = contentBeforeSave
+      this.lastAppliedSource = source ?? null
       try {
         const saved = await this.document.save()
         this.isSaving = false
@@ -756,7 +764,7 @@ class DocumentSyncSession {
     }
 
     if (content !== this.document.getText()) {
-      if (this.lastAppliedFromWebview !== content) {
+      if (this.lastAppliedFromWebview !== content && source !== this.lastAppliedSource) {
         this.postSaveResponse(source, { type: 'save-failed', requestId, reason: 'stale-content' })
         return
       }

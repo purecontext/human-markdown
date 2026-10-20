@@ -1,12 +1,12 @@
 # Session Resume Context
 
 ## Working on
-ADR collection for Human Markdown — branch `docs/adr-collection`
+Fixing bugs reported by felixontv (issues #133, #134, #135)
 
 ## Completed
-Mined 16 Claude Code session transcripts for architectural decisions. Split monolithic `docs/adrs/adrs.md` into 18 individual ADR files plus a README index. Deleted the monolithic file.
-
-ADRs 001-003 extracted from existing documentation. ADRs 004-018 written from transcript evidence covering: code block editing model, IIFE bundles, find bar, CodeMirror raw mode, theme engine, hybrid WYSIWYG model, frontmatter rendering, CSP/Mermaid security, spellcheck blocker, list round-trip fix, zoom compensation, link opening, dual marketplace publishing, Shiki grammars, and document sync.
+- Investigated all three issues from felixontv against Cursor previewer-swap hypothesis — none are Cursor-related (user is on VS Code on Linux)
+- Fixed #135 (checkbox save failure): stale-content guard in `saveWebviewContent` rejected source-spliced saves from the same webview. Added `lastAppliedSource` tracking so the guard only rejects saves from a *different* webview panel.
 
 ## Next
-Review, commit, and PR the ADR collection. Update any project rules that reference the old monolithic file.
+- #134 (frontmatter/H1 edits intermittently not registered): likely a timing window in the `markdownUpdated` listener guards. Needs investigation of the debounce + guard flag interaction.
+- #133 (git diff gutter missing): known platform limitation — VS Code diff decorations are a TextEditor/Monaco feature, not available in CustomTextEditorProvider webviews. Document as a known limitation.

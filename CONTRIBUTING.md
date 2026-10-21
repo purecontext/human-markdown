@@ -23,6 +23,7 @@ Press **F5** in VSCode to launch the Extension Development Host for testing.
 | `pnpm lint` | Lint and format check (Biome) |
 | `pnpm lint:fix` | Auto-fix lint issues |
 | `pnpm typecheck` | TypeScript strict mode check |
+| `pnpm check` | Lint, typecheck, and unit tests in one pass |
 | `pnpm package` | Build and package as .vsix |
 
 ## Architecture
@@ -55,10 +56,8 @@ Heavy libraries (Shiki, Mermaid, KaTeX) are built as separate IIFE bundles loade
 
 2. Make your changes. Ensure all checks pass:
    ```bash
-   pnpm lint
-   pnpm typecheck
+   pnpm check
    pnpm build
-   pnpm test
    ```
 
 3. Push and open a PR against `main`. Include:

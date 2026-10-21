@@ -1,6 +1,9 @@
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
+import { realpath } from 'node:fs/promises'
+import * as os from 'node:os'
 import * as path from 'node:path'
-import { describe, expect, it } from 'vitest'
-import { classifyHref, isPathContained } from './link-policy'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { classifyHref, isPathContained, isRealPathContained, resolveRealPath } from './link-policy'
 
 describe('classifyHref', () => {
   it.each([
@@ -20,6 +23,9 @@ describe('classifyHref', () => {
     'data:text/html,<script>alert(1)</script>',
     'vbscript:msgbox',
     'vscode-webview://abc/index.html',
+    'C:/Windows/System32/cmd.exe',
+    'c:\\Users\\me\\secret.txt',
+    'Z:relative-drive-path',
   ])('refuses %s', (href) => {
     expect(classifyHref(href)).toMatchObject({ kind: 'external', decision: 'refuse' })
   })
@@ -90,5 +96,90 @@ describe('isPathContained', () => {
     expect(isPathContained('C:\\work\\project', 'D:\\secrets\\a.md', path.win32)).toBe(false)
     expect(isPathContained('C:\\work\\project', 'C:\\work\\project\\a.md', path.win32)).toBe(true)
     expect(isPathContained('C:\\work\\project', 'C:\\work\\other\\a.md', path.win32)).toBe(false)
+  })
+})
+
+describe('isRealPathContained (real filesystem)', () => {
+  let base: string
+  let root: string
+
+  beforeAll(() => {
+    // realpath the temp dir itself: on macOS /var and /tmp are symlinks.
+    base = realpathSync(mkdtempSync(path.join(os.tmpdir(), 'hm-link-policy-')))
+    root = path.join(base, 'workspace')
+    mkdirSync(path.join(root, 'docs'), { recursive: true })
+    writeFileSync(path.join(root, 'docs', 'a.md'), 'a')
+    writeFileSync(path.join(base, 'outside.md'), 'secret')
+    symlinkSync(path.join(base, 'outside.md'), path.join(root, 'docs', 'escape.md'))
+    symlinkSync(path.join(root, 'docs', 'a.md'), path.join(root, 'inside-link.md'))
+    symlinkSync(base, path.join(root, 'up'))
+  })
+
+  afterAll(() => {
+    rmSync(base, { recursive: true, force: true })
+  })
+
+  it('accepts a real file inside the root', async () => {
+    expect(await isRealPathContained(root, path.join(root, 'docs', 'a.md'), realpath)).toBe(true)
+  })
+
+  it('refuses a symlinked file that points outside the root', async () => {
+    expect(await isRealPathContained(root, path.join(root, 'docs', 'escape.md'), realpath)).toBe(
+      false,
+    )
+  })
+
+  it('refuses a path through a symlinked directory that leaves the root', async () => {
+    expect(await isRealPathContained(root, path.join(root, 'up', 'outside.md'), realpath)).toBe(
+      false,
+    )
+  })
+
+  it('accepts a symlink that stays inside the root', async () => {
+    expect(await isRealPathContained(root, path.join(root, 'inside-link.md'), realpath)).toBe(true)
+  })
+
+  it('accepts a not-yet-existing file inside the root', async () => {
+    expect(await isRealPathContained(root, path.join(root, 'docs', 'new', 'b.md'), realpath)).toBe(
+      true,
+    )
+  })
+
+  it('refuses a not-yet-existing file under a directory symlink that leaves the root', async () => {
+    expect(await isRealPathContained(root, path.join(root, 'up', 'new.md'), realpath)).toBe(false)
+  })
+
+  it('refuses a lexical escape before touching the filesystem', async () => {
+    const fail = () => Promise.reject(new Error('should not be called'))
+    expect(await isRealPathContained(root, path.join(base, 'outside.md'), fail)).toBe(false)
+  })
+})
+
+describe('resolveRealPath', () => {
+  const enoent = () => Object.assign(new Error('missing'), { code: 'ENOENT' })
+
+  it('walks up to the nearest existing ancestor on ENOENT', async () => {
+    const fake = async (p: string) => {
+      if (p === '/real/dir') return '/resolved/dir'
+      throw enoent()
+    }
+    expect(await resolveRealPath('/real/dir/new/file.md', fake, path.posix)).toBe(
+      '/resolved/dir/new/file.md',
+    )
+  })
+
+  it('propagates errors other than ENOENT', async () => {
+    const fake = async () => {
+      throw Object.assign(new Error('denied'), { code: 'EACCES' })
+    }
+    await expect(resolveRealPath('/x/y', fake, path.posix)).rejects.toThrow('denied')
+  })
+
+  it('treats a resolution error as not contained', async () => {
+    const fake = async (p: string) => {
+      if (p === '/root') return '/root'
+      throw Object.assign(new Error('denied'), { code: 'EACCES' })
+    }
+    expect(await isRealPathContained('/root', '/root/a.md', fake, path.posix)).toBe(false)
   })
 })

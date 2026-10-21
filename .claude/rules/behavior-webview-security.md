@@ -10,7 +10,8 @@ Every webview must set a strict Content Security Policy:
 The webview renders untrusted markdown (cloned READMEs, PR branches), so assume script can run in it. The sandbox denies it the filesystem, Node and fetch, but not `postMessage` to the fully privileged host, and `img-src https:` can still carry data out. Defend at the host:
 
 - Every webview message passes `parseWebviewMessage` (`src/webview-message-guard.ts`) before any handler sees it. A new message type gets a parser and a drop test there.
-- Links go through `classifyHref` (`src/link-policy.ts`): http/https/mailto open, `command:`/`file:`/`javascript:`/`data:` are refused, any other scheme needs a modal naming the full URL. Relative links and image paths stay inside the workspace or document folder via `isPathContained`.
+- Links go through `classifyHref` (`src/link-policy.ts`): http/https/mailto open; `command:`, `file:`, `javascript:`, `data:` and one-letter schemes (Windows drive paths) are refused; any other scheme needs a modal naming the full URL. `LinkOpener` (`src/link-opener.ts`) performs the side effects and allows one prompt in flight per panel, so a message loop can't stack modals.
+- Relative links stay inside the workspace folder and image paths inside the document folder. For `file:` documents, `isRealPathContained` resolves symlinks first, so a committed symlink can't point outside.
 
 ## Rendering hygiene
 

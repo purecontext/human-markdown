@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict'
+import { symlinkSync, writeFileSync } from 'node:fs'
+import * as path from 'node:path'
 import * as vscode from 'vscode'
 
 const EXTENSION_ID = 'purecontext.human-markdown'
@@ -1141,38 +1143,51 @@ const tests: IntegrationTest[] = [
   {
     name: 'unsafe link schemes and workspace escapes are refused',
     run: async () => {
+      const folder = vscode.workspace.workspaceFolders?.[0]
+      assert.ok(folder, 'Expected integration test workspace folder')
+      const outside = path.join(path.dirname(folder.uri.fsPath), 'outside-link-target.md')
+      writeFileSync(outside, 'secret\n')
+      symlinkSync(outside, path.join(folder.uri.fsPath, 'symlink-escape.md'))
+
       const hrefs = {
         file: 'file:///etc/passwd',
         command: 'command:workbench.action.terminal.new',
+        drive: 'C:/Windows/System32/cmd.exe',
         custom: 'vscode://vscode.git/clone?url=https://example.com/x.git',
         escape: '../../outside.md',
+        symlink: 'symlink-escape.md',
       }
       const uri = await writeWorkspaceFile(
         'link-refusal.md',
-        [
-          '# Unsafe links',
-          '',
-          `[File](${hrefs.file})`,
-          `[Command](${hrefs.command})`,
-          `[Custom](${hrefs.custom})`,
-          `[Escape](${hrefs.escape})`,
-          '',
-        ].join('\n'),
+        ['# Unsafe links', '', ...Object.values(hrefs).map((href) => `[Link](${href})`), ''].join(
+          '\n',
+        ),
       )
 
       await openHumanMarkdown(uri)
       await waitForMilkdownReady(uri)
 
-      const expectations: Array<[string, string]> = [
-        [hrefs.file, 'external-refuse'],
-        [hrefs.command, 'external-refuse'],
-        [hrefs.custom, 'external-confirm'],
-        [hrefs.escape, 'relative-refused'],
+      // Each link must reach its expected side effect and never an open call.
+      const expectations: Array<[string, (action: Record<string, unknown>) => boolean]> = [
+        [hrefs.file, (a) => a.type === 'warn' && String(a.message).includes(hrefs.file)],
+        [hrefs.command, (a) => a.type === 'warn' && String(a.message).includes(hrefs.command)],
+        [hrefs.drive, (a) => a.type === 'warn' && String(a.message).includes(hrefs.drive)],
+        // The test confirm prompt declines, so the link must stop at the prompt.
+        [hrefs.custom, (a) => a.type === 'external-confirm' && a.href === hrefs.custom],
+        [
+          hrefs.escape,
+          (a) => a.type === 'warn' && String(a.message).includes('outside the workspace'),
+        ],
+        [
+          hrefs.symlink,
+          (a) => a.type === 'warn' && String(a.message).includes('outside the workspace'),
+        ],
       ]
-      for (const [href, type] of expectations) {
+      for (const [href, matches] of expectations) {
         await clearActions(uri)
         await clickLink(uri, href)
-        await waitForAction(uri, (action) => action.type === type && action.href === href)
+        await waitForAction(uri, matches)
+        await settle()
         const actions = await getActions(uri)
         assert.ok(
           actions.every(
@@ -1181,6 +1196,34 @@ const tests: IntegrationTest[] = [
           `${href} must not open: ${JSON.stringify(actions)}`,
         )
       }
+    },
+  },
+  {
+    name: 'symlinked images that point outside the document directory do not resolve',
+    run: async () => {
+      const folder = vscode.workspace.workspaceFolders?.[0]
+      assert.ok(folder, 'Expected integration test workspace folder')
+      const outside = path.join(path.dirname(folder.uri.fsPath), 'outside-image.png')
+      writeFileSync(outside, tinyPngBytes())
+      symlinkSync(outside, path.join(folder.uri.fsPath, 'symlinked.png'))
+      const uri = await writeWorkspaceFile(
+        'symlink-image.md',
+        '# Symlinked Image\n\n![Linked](symlinked.png)\n',
+      )
+
+      await openHumanMarkdown(uri)
+      await waitForMilkdownReady(uri)
+      await settle()
+
+      const messages = await getWebviewMessages(uri)
+      assert.equal(
+        messages.some((message) => {
+          return message.type === 'image-uri-resolved' && message.src === 'symlinked.png'
+        }),
+        false,
+      )
+      const imageState = await reportWebviewState(uri)
+      assert.equal(imageState.imageSrc, null)
     },
   },
   {

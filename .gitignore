@@ -9,3 +9,4 @@ dist/
 # Crucible QA (ephemeral per-operator state)
 .forge/crucible/review-checkpoints/
 .forge/crucible/review-state/
+.forge/recall.db*

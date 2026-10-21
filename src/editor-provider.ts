@@ -1,10 +1,11 @@
 import { randomBytes } from 'node:crypto'
-import * as path from 'node:path'
 import * as vscode from 'vscode'
+import { classifyHref, isPathContained, type LinkTarget } from './link-policy'
 import type { ExtensionToWebviewMessage, WebviewToExtensionMessage } from './messages'
 import { getConfiguredThemeName, resolveThemeTokens } from './theme-resolver'
 import { threeWayMerge } from './three-way-merge'
 import { WebviewEditSequencer } from './webview-edit-sequencer'
+import { parseWebviewMessage } from './webview-message-guard'
 
 interface TestSession {
   uri: vscode.Uri
@@ -150,13 +151,18 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     const syncSession = this.getOrCreateDocumentSyncSession(document)
     syncSession.addWebview(webview)
     let onMessageReceived: (msg: WebviewToExtensionMessage) => void = () => {}
+    const testHooksEnabled = process.env.HUMAN_MARKDOWN_TEST_HOOKS === '1'
+    const receiveUntrusted = (raw: unknown) => {
+      const msg = parseWebviewMessage(raw, testHooksEnabled)
+      if (msg) onMessageReceived(msg)
+    }
     const sessionMessages: ExtensionToWebviewMessage[] = []
     const webviewEvents: WebviewToExtensionMessage[] = []
     const testActions: Record<string, unknown>[] = []
     const documentKey = document.uri.toString()
     const testSession: TestSession = {
       uri: document.uri,
-      sendMessage: (msg) => onMessageReceived(msg),
+      sendMessage: (msg) => receiveUntrusted(msg),
       postMessage: (msg) => this.postMessage(webview, msg),
       getMessages: () => [...sessionMessages],
       getWebviewEvents: () => [...webviewEvents],
@@ -235,28 +241,44 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         }
         case 'open-link': {
           const href = msg.href
-          if (/^[a-z][a-z0-9+.-]*:/i.test(href)) {
-            if (process.env.HUMAN_MARKDOWN_TEST_HOOKS === '1') {
-              testActions.push({ type: 'open-external', href })
+          const target = classifyHref(href)
+          if (target.kind === 'fragment') break
+          if (target.kind === 'external') {
+            if (testHooksEnabled) {
+              testActions.push({ type: `external-${target.decision}`, href })
               break
             }
-            vscode.env.openExternal(vscode.Uri.parse(href))
-          } else if (!href.startsWith('#')) {
-            const docDir = vscode.Uri.joinPath(document.uri, '..')
-            const targetUri = vscode.Uri.joinPath(docDir, href)
-            if (process.env.HUMAN_MARKDOWN_TEST_HOOKS === '1') {
-              testActions.push({ type: 'open-relative', href, uri: targetUri.toString() })
-              break
-            }
-            vscode.commands.executeCommand('vscode.open', targetUri)
+            openExternalLink(href, target.decision)
+            break
           }
+          if (!target.pathPart) break
+          const docDir = vscode.Uri.joinPath(document.uri, '..')
+          const targetUri = vscode.Uri.joinPath(docDir, target.pathPart)
+          // Links may reach sibling folders in the workspace, never outside it.
+          const root = vscode.workspace.getWorkspaceFolder(document.uri)?.uri ?? docDir
+          if (!isPathContained(root.fsPath, targetUri.fsPath)) {
+            if (testHooksEnabled) {
+              testActions.push({ type: 'relative-refused', href })
+              break
+            }
+            vscode.window.showWarningMessage(
+              `Human Markdown blocked a link outside the workspace: ${href}`,
+            )
+            break
+          }
+          if (testHooksEnabled) {
+            testActions.push({ type: 'open-relative', href, uri: targetUri.toString() })
+            break
+          }
+          vscode.commands.executeCommand('vscode.open', targetUri).then(undefined, (err) => {
+            vscode.window.showErrorMessage(`Human Markdown could not open ${href}: ${err}`)
+          })
           break
         }
         case 'resolve-image-uri': {
           const docDir = vscode.Uri.joinPath(document.uri, '..')
           const imageUri = vscode.Uri.joinPath(docDir, msg.src)
-          const relative = path.relative(docDir.fsPath, imageUri.fsPath)
-          if (relative.startsWith('..') || path.isAbsolute(relative)) {
+          if (!isPathContained(docDir.fsPath, imageUri.fsPath)) {
             break
           }
           const webviewUri = webview.asWebviewUri(imageUri).toString()
@@ -284,7 +306,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       }
     }
 
-    const onMessage = webview.onDidReceiveMessage(onMessageReceived)
+    const onMessage = webview.onDidReceiveMessage(receiveUntrusted)
 
     webviewPanel.onDidDispose(() => {
       this.webviews.delete(webview)
@@ -844,6 +866,37 @@ class DocumentSyncSession {
       }
     }
   }
+}
+
+type ExternalDecision = Extract<LinkTarget, { kind: 'external' }>['decision']
+
+// Link text can disguise its target, so anything beyond http(s)/mailto names
+// the full URL and waits for the user before handing it to the OS.
+function openExternalLink(href: string, decision: ExternalDecision): void {
+  if (decision === 'refuse') {
+    vscode.window.showWarningMessage(`Human Markdown blocked a link with an unsafe scheme: ${href}`)
+    return
+  }
+  const fail = (err: unknown) => {
+    vscode.window.showErrorMessage(`Human Markdown could not open ${href}: ${err}`)
+  }
+  const open = () => {
+    try {
+      vscode.env.openExternal(vscode.Uri.parse(href)).then(undefined, fail)
+    } catch (err) {
+      // Uri.parse throws on some malformed URIs before a promise exists.
+      fail(err)
+    }
+  }
+  if (decision === 'open') {
+    open()
+    return
+  }
+  vscode.window
+    .showWarningMessage(`Open this link outside VS Code?\n\n${href}`, { modal: true }, 'Open')
+    .then((choice) => {
+      if (choice === 'Open') open()
+    })
 }
 
 function getNonce(): string {

@@ -3,6 +3,7 @@ import type { Node as ProsemirrorNode } from '@milkdown/prose/model'
 import type { EditorView } from '@milkdown/prose/view'
 import remarkFrontmatter from 'remark-frontmatter'
 import { detectTheme, getShikiHighlighter } from './code-block-view'
+import { renderPlainFrontmatter } from './frontmatter-render'
 
 let collapsed = false
 let syncState: ((collapsed: boolean) => void) | null = null
@@ -45,10 +46,6 @@ export const frontmatterNodeSchema = $nodeSchema('frontmatter', () => ({
     },
   },
 }))
-
-function escapeHtml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-}
 
 export const frontmatterView = $view(frontmatterNodeSchema.node, () => {
   return (node: ProsemirrorNode, _view: EditorView, _getPos: () => number | undefined) => {
@@ -95,26 +92,30 @@ export const frontmatterView = $view(frontmatterNodeSchema.node, () => {
         return
       }
       lastText = content
-      rendered.innerHTML = `<pre><code>${escapeHtml(content)}</code></pre>`
+      renderPlainFrontmatter(rendered, content)
 
       const ready = getShikiHighlighter()
       if (!ready) return
-      ready.then((hl) => {
-        if (container.classList.contains('editing')) return
-        const highlighted = hl.codeToHtml(content, {
-          lang: 'yaml',
-          theme: detectTheme(),
+      ready
+        .then((hl) => {
+          if (container.classList.contains('editing')) return
+          const highlighted = hl.codeToHtml(content, {
+            lang: 'yaml',
+            theme: detectTheme(),
+          })
+          const temp = document.createElement('div')
+          temp.innerHTML = highlighted
+          const newPre = temp.querySelector('pre')
+          if (newPre) {
+            newPre.style.background = 'none'
+            newPre.removeAttribute('tabindex')
+            rendered.replaceChildren(newPre)
+          }
         })
-        const temp = document.createElement('div')
-        temp.innerHTML = highlighted
-        const newPre = temp.querySelector('pre')
-        if (newPre) {
-          newPre.style.background = 'none'
-          newPre.removeAttribute('tabindex')
-          rendered.innerHTML = ''
-          rendered.appendChild(newPre)
-        }
-      })
+        .catch((err) => {
+          // The plain rendering above stays in place; only highlighting is lost.
+          console.warn('[human-markdown] frontmatter highlighting failed', err)
+        })
     }
 
     updateRendered(node.textContent)

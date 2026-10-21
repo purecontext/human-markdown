@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.6 - 2026-10-20
+
+### Fixed
+- Task-list checkbox toggles and new checkbox creation no longer cause "Save
+  failed" errors. The save pipeline now correctly allows source-spliced content
+  from the same editor panel.
+- Frontmatter and H1 heading edits are no longer intermittently lost. Fixed a
+  node view mutation handling gap in the frontmatter card and removed a race
+  condition in the change listener that could silently drop edits when an
+  external document update arrived during the debounce window.
+
+### Improved
+- Updated `@vscode/vsce` to 4.0.0, `@vscode/test-electron` to 3.1.0, and
+  resolved high-severity transitive dependency vulnerabilities.
+- CI now runs on pnpm 10 with `--ignore-unfixable` for audit advisories that
+  have no available patch.
+
 ## 0.5.5 - 2026-06-25
 
 ### Changed

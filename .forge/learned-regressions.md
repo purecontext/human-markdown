@@ -103,3 +103,24 @@ When a pattern hits 3+ recurrences, Crucible proposes a rule update in `rule-upd
 - **Risk:** Production users, other extensions, or compromised webview code could invoke test-only mutation paths, bypassing normal UI constraints and exposing internal editor state.
 - **Mitigation:** Gate test command registration and webview test message handlers behind the same explicit test environment flag, and make test reporters no-op when the flag is absent.
 - **Status:** active
+
+## convention-gate-script-mirrors-ci
+- **First seen:** PR #142 — `package.json:186` (round 1)
+- **Recurrences:** (none yet)
+- **Count:** 1
+- **Pattern:** A local aggregate check script (`check`) was written as lint + typecheck + test and left out the build that CI runs between them. The tests read build output (`bundle-size.test.ts` reads gitignored `dist/`), so the gate failed on a fresh clone and measured a stale bundle on an existing checkout. Before adding a local gate, read the CI workflow and mirror its step order, including any build the tests depend on.
+- **Status:** active
+
+## convention-docs-pointer-unverified
+- **First seen:** PR #142 — `CLAUDE.md:54` (round 1)
+- **Recurrences:** (none yet)
+- **Count:** 1
+- **Pattern:** An edit rewrote a sentence in CLAUDE.md and kept a path reference (`plugins/forge/README.md`) that has never existed in this repo. When you edit a line that names a path, check that the path exists.
+- **Status:** active
+
+## convention-registry-gate-contradicts-project-rule
+- **First seen:** PR #142 — `.forge/quality-gates.json:25-31` (round 1)
+- **Recurrences:** (none yet)
+- **Count:** 1
+- **Pattern:** A registry-synced quality gate (`async-state-timing`: "set guard flags after the operation succeeds") contradicts a project rule (`behavior-async-state-mutations.md`: guard flags before the call). After a gate sync, read the block-severity gates against `.claude/rules/` and record any conflict as a `custom` override, so the agent isn't handed two opposite instructions.
+- **Status:** active

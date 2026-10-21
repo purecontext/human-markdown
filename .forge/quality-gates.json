@@ -118,7 +118,7 @@
   "custom": [
     {
       "id": "async-state-timing-override",
-      "instruction": "Overrides the guard-flag sentence in the registry's async-state-timing gate, which contradicts .claude/rules/behavior-async-state-mutations.md. Re-entry guard flags (isSaving, hasOfferedReopen) are set BEFORE the async call and cleared in finally; the flag means initiated, not succeeded. Dependent state (baseContent, webviewIsDirty) is set only inside the success path. When the two gates disagree, follow this one.",
+      "instruction": "Overrides the guard-flag sentence in the registry's async-state-timing gate, which contradicts .claude/rules/behavior-async-state-mutations.md. Re-entry guard flags (isSaving, hasOfferedReopen) are set BEFORE the async call; the flag means initiated, not succeeded. Per-operation flags (isSaving) are cleared in finally; once-per-session flags (hasOfferedReopen) are never cleared. Dependent state (baseContent, webviewIsDirty) is set only inside the success path. When the two gates disagree, follow this one.",
       "triggers": ["next"],
       "severity": "block",
       "detection": "always"

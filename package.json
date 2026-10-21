@@ -183,6 +183,7 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "typecheck": "tsc --noEmit",
+    "check": "pnpm lint && pnpm typecheck && pnpm build && pnpm test",
     "package": "pnpm build && vsce package --no-dependencies",
     "publish": "pnpm build && vsce publish --no-dependencies",
     "prepare": "husky"

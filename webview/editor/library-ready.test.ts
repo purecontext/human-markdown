@@ -1,8 +1,20 @@
 // @vitest-environment jsdom
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createLibraryWaiter } from './library-ready'
 
 describe('createLibraryWaiter', () => {
+  let readyState: DocumentReadyState
+
+  beforeEach(() => {
+    // Views wait while the page (and its async library bundles) is still loading.
+    readyState = 'loading'
+    vi.spyOn(document, 'readyState', 'get').mockImplementation(() => readyState)
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('re-renders once when the library announces itself', () => {
     const onReady = vi.fn()
     const waiter = createLibraryWaiter(onReady)
@@ -30,12 +42,43 @@ describe('createLibraryWaiter', () => {
     expect(onReady).toHaveBeenCalledTimes(2)
   })
 
+  it('reports the library unavailable if the page finishes loading first', () => {
+    const onReady = vi.fn()
+    const onUnavailable = vi.fn()
+    const waiter = createLibraryWaiter(onReady, onUnavailable)
+    waiter.wait('lib-e-ready')
+    window.dispatchEvent(new Event('load'))
+    window.dispatchEvent(new Event('lib-e-ready'))
+    expect(onUnavailable).toHaveBeenCalledTimes(1)
+    expect(onReady).not.toHaveBeenCalled()
+  })
+
+  it('reports unavailable at once when asked to wait after the page loaded', () => {
+    readyState = 'complete'
+    const onUnavailable = vi.fn()
+    const waiter = createLibraryWaiter(vi.fn(), onUnavailable)
+    waiter.wait('lib-f-ready')
+    expect(onUnavailable).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not report unavailable after the library arrived', () => {
+    const onUnavailable = vi.fn()
+    const waiter = createLibraryWaiter(vi.fn(), onUnavailable)
+    waiter.wait('lib-g-ready')
+    window.dispatchEvent(new Event('lib-g-ready'))
+    window.dispatchEvent(new Event('load'))
+    expect(onUnavailable).not.toHaveBeenCalled()
+  })
+
   it('stops listening when disposed', () => {
     const onReady = vi.fn()
-    const waiter = createLibraryWaiter(onReady)
+    const onUnavailable = vi.fn()
+    const waiter = createLibraryWaiter(onReady, onUnavailable)
     waiter.wait('lib-d-ready')
     waiter.dispose()
     window.dispatchEvent(new Event('lib-d-ready'))
+    window.dispatchEvent(new Event('load'))
     expect(onReady).not.toHaveBeenCalled()
+    expect(onUnavailable).not.toHaveBeenCalled()
   })
 })

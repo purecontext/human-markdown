@@ -160,9 +160,17 @@ export const codeBlockView = $view(codeBlockSchema.node, (_ctx: Ctx) => {
     }
 
     let lastText = node.textContent
-    const libraryWaiter = createLibraryWaiter(() => {
-      if (!container.classList.contains('editing')) updateRendered()
-    })
+    const libraryWaiter = createLibraryWaiter(
+      () => {
+        if (!container.classList.contains('editing')) updateRendered()
+      },
+      () => {
+        // Code blocks keep their plain render; a diagram has nothing to show.
+        if (!isMermaid || !rendered) return
+        rendered.textContent = 'Mermaid not available'
+        rendered.classList.add('mermaid-error')
+      },
+    )
 
     function updateRendered(text?: string) {
       const content = text ?? code.textContent ?? lastText

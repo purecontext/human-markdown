@@ -124,3 +124,39 @@ When a pattern hits 3+ recurrences, Crucible proposes a rule update in `rule-upd
 - **Count:** 1
 - **Pattern:** A registry-synced quality gate (`async-state-timing`: "set guard flags after the operation succeeds") contradicts a project rule (`behavior-async-state-mutations.md`: guard flags before the call). After a gate sync, read the block-severity gates against `.claude/rules/` and record any conflict as a `custom` override, so the agent isn't handed two opposite instructions.
 - **Status:** active
+
+## convention-test-seam-at-side-effect
+- **First seen:** PR #143 — `src/editor-provider.ts:247-250` (round 1)
+- **Recurrences:** (none yet)
+- **Count:** 1
+- **Pattern:** The test-hook branch recorded a decision and returned before the code that acted on it. Integration tests then proved only the classifier: a `refuse` that fell through to `openExternal` passed every test. Put test seams at the side-effect calls (inject the effects) and record there, so tests observe what each decision actually reaches.
+- **Status:** active
+
+## behavior-symlink-aware-containment
+- **First seen:** PR #143 — `src/link-policy.ts:30-42` (round 1)
+- **Recurrences:** (none yet)
+- **Count:** 1
+- **Pattern:** A `path.relative` containment check is lexical. A symlink committed to a cloned repo points outside the root and still passes. For local files, realpath both root and target before comparing, resolve a nonexistent target through its nearest existing ancestor, and refuse on any other error.
+- **Status:** active
+
+## behavior-scheme-regex-drive-letters
+- **First seen:** PR #143 — `src/link-policy.ts:8-10` (round 1)
+- **Recurrences:** (none yet)
+- **Count:** 1
+- **Pattern:** A generic URI-scheme regex (`^[a-z][a-z0-9+.-]*:`) reads a Windows path `C:/x` as scheme `c`. That slipped past a refuse list into the "confirm" path, where ShellExecute would launch it. Treat one-letter schemes as local paths and refuse them.
+- **Status:** active
+
+## behavior-unbounded-modal-from-untrusted-messages
+- **First seen:** PR #143 — `src/editor-provider.ts:894-900` (round 1)
+- **Recurrences:** (none yet)
+- **Count:** 1
+- **Pattern:** Each untrusted webview message could open its own modal prompt, so a message loop could lock the window and train the user to click through. When an untrusted source can trigger a prompt, allow one in flight per source, set the guard before showing it, and drop requests while it is open.
+- **Status:** active
+
+## behavior-catch-fire-and-forget
+- **First seen:** PR #143 — `src/editor-provider.ts:894-900` (round 1, confirm prompt `.then`)
+- **Recurrences:**
+  - PR #143 — `src/editor-provider.ts:267-283` (round 2) — the new containment `.then` chains had no rejection handler
+- **Count:** 2
+- **Pattern:** New fire-and-forget promise chains were added without a rejection handler, twice in the same PR, even though the rule is already in `.claude/rules/behavior-catch-fire-and-forget.md`. After writing any `.then(` on a promise nobody awaits, add the `.catch` in the same edit.
+- **Status:** active

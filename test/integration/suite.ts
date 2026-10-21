@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict'
+import { symlinkSync, writeFileSync } from 'node:fs'
+import * as path from 'node:path'
 import * as vscode from 'vscode'
 
 const EXTENSION_ID = 'purecontext.human-markdown'
@@ -1121,7 +1123,7 @@ const tests: IntegrationTest[] = [
       await clearActions(uri)
       await clickLink(uri, 'https://example.com/docs')
       const externalAction = await waitForAction(uri, (action) => {
-        return action.type === 'open-external' && action.href === 'https://example.com/docs'
+        return action.type === 'external-open' && action.href === 'https://example.com/docs'
       })
       assert.equal(externalAction.href, 'https://example.com/docs')
 
@@ -1136,6 +1138,124 @@ const tests: IntegrationTest[] = [
       await clickLink(uri, '#local-heading')
       await settle()
       assert.deepEqual(await getActions(uri), [])
+    },
+  },
+  {
+    name: 'unsafe link schemes and workspace escapes are refused',
+    run: async () => {
+      const folder = vscode.workspace.workspaceFolders?.[0]
+      assert.ok(folder, 'Expected integration test workspace folder')
+      const outside = path.join(path.dirname(folder.uri.fsPath), 'outside-link-target.md')
+      writeFileSync(outside, 'secret\n')
+      symlinkSync(outside, path.join(folder.uri.fsPath, 'symlink-escape.md'))
+
+      const hrefs = {
+        file: 'file:///etc/passwd',
+        command: 'command:workbench.action.terminal.new',
+        drive: 'C:/Windows/System32/cmd.exe',
+        custom: 'vscode://vscode.git/clone?url=https://example.com/x.git',
+        escape: '../../outside.md',
+        symlink: 'symlink-escape.md',
+      }
+      const uri = await writeWorkspaceFile(
+        'link-refusal.md',
+        ['# Unsafe links', '', ...Object.values(hrefs).map((href) => `[Link](${href})`), ''].join(
+          '\n',
+        ),
+      )
+
+      await openHumanMarkdown(uri)
+      await waitForMilkdownReady(uri)
+
+      // Each link must reach its expected side effect and never an open call.
+      const expectations: Array<[string, (action: Record<string, unknown>) => boolean]> = [
+        [hrefs.file, (a) => a.type === 'warn' && String(a.message).includes(hrefs.file)],
+        [hrefs.command, (a) => a.type === 'warn' && String(a.message).includes(hrefs.command)],
+        [hrefs.drive, (a) => a.type === 'warn' && String(a.message).includes(hrefs.drive)],
+        // The test confirm prompt declines, so the link must stop at the prompt.
+        [hrefs.custom, (a) => a.type === 'external-confirm' && a.href === hrefs.custom],
+        [
+          hrefs.escape,
+          (a) => a.type === 'warn' && String(a.message).includes('outside the workspace'),
+        ],
+        [
+          hrefs.symlink,
+          (a) => a.type === 'warn' && String(a.message).includes('outside the workspace'),
+        ],
+      ]
+      for (const [href, matches] of expectations) {
+        await clearActions(uri)
+        await clickLink(uri, href)
+        await waitForAction(uri, matches)
+        await settle()
+        const actions = await getActions(uri)
+        assert.ok(
+          actions.every(
+            (action) => action.type !== 'external-open' && action.type !== 'open-relative',
+          ),
+          `${href} must not open: ${JSON.stringify(actions)}`,
+        )
+      }
+    },
+  },
+  {
+    name: 'symlinked images that point outside the document directory do not resolve',
+    run: async () => {
+      const folder = vscode.workspace.workspaceFolders?.[0]
+      assert.ok(folder, 'Expected integration test workspace folder')
+      const outside = path.join(path.dirname(folder.uri.fsPath), 'outside-image.png')
+      writeFileSync(outside, tinyPngBytes())
+      symlinkSync(outside, path.join(folder.uri.fsPath, 'symlinked.png'))
+      const uri = await writeWorkspaceFile(
+        'symlink-image.md',
+        '# Symlinked Image\n\n![Linked](symlinked.png)\n',
+      )
+
+      await openHumanMarkdown(uri)
+      await waitForMilkdownReady(uri)
+      await settle()
+
+      const messages = await getWebviewMessages(uri)
+      assert.equal(
+        messages.some((message) => {
+          return message.type === 'image-uri-resolved' && message.src === 'symlinked.png'
+        }),
+        false,
+      )
+      const imageState = await reportWebviewState(uri)
+      assert.equal(imageState.imageSrc, null)
+    },
+  },
+  {
+    name: 'malformed webview messages are dropped before they reach the host',
+    run: async () => {
+      const original = '# Malformed\n\nOriginal content.\n'
+      const uri = await writeWorkspaceFile('malformed-webview-message.md', original)
+      const document = await vscode.workspace.openTextDocument(uri)
+
+      await openHumanMarkdown(uri)
+      await clearWebviewMessages(uri)
+      await sendWebviewMessage(uri, { type: 'save', content: 42, requestId: 7 })
+      await sendWebviewMessage(uri, { type: 'save', content: 'Injected\n', requestId: '8' })
+      await sendWebviewMessage(uri, { type: 'edit', content: 'Injected\n', revision: 'NaN' })
+      await settle()
+
+      const replies = await getWebviewMessages(uri)
+      assert.ok(
+        replies.every(
+          (message) => message.type !== 'save-success' && message.type !== 'save-failed',
+        ),
+        `malformed saves must get no reply: ${JSON.stringify(replies)}`,
+      )
+      assert.equal(document.getText(), original)
+      const diskContent = new TextDecoder().decode(await vscode.workspace.fs.readFile(uri))
+      assert.equal(diskContent, original)
+
+      // A well-formed save on the same session still works after the dropped ones.
+      await sendWebviewMessage(uri, { type: 'save', content: original, requestId: 9 })
+      await waitForWebviewMessage(uri, (message) => {
+        return message.type === 'save-success' && message.requestId === 9
+      })
     },
   },
   {

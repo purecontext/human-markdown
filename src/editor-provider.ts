@@ -1,10 +1,13 @@
 import { randomBytes } from 'node:crypto'
-import * as path from 'node:path'
+import { realpath } from 'node:fs/promises'
 import * as vscode from 'vscode'
+import { LinkOpener, type LinkOpenerEffects } from './link-opener'
+import { classifyHref, isPathContained, isRealPathContained } from './link-policy'
 import type { ExtensionToWebviewMessage, WebviewToExtensionMessage } from './messages'
 import { getConfiguredThemeName, resolveThemeTokens } from './theme-resolver'
 import { threeWayMerge } from './three-way-merge'
 import { WebviewEditSequencer } from './webview-edit-sequencer'
+import { parseWebviewMessage } from './webview-message-guard'
 
 interface TestSession {
   uri: vscode.Uri
@@ -150,13 +153,28 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     const syncSession = this.getOrCreateDocumentSyncSession(document)
     syncSession.addWebview(webview)
     let onMessageReceived: (msg: WebviewToExtensionMessage) => void = () => {}
+    const testHooksEnabled = process.env.HUMAN_MARKDOWN_TEST_HOOKS === '1'
+    const receiveUntrusted = (raw: unknown) => {
+      const msg = parseWebviewMessage(raw, testHooksEnabled)
+      if (msg) onMessageReceived(msg)
+    }
     const sessionMessages: ExtensionToWebviewMessage[] = []
     const webviewEvents: WebviewToExtensionMessage[] = []
     const testActions: Record<string, unknown>[] = []
+    const linkOpener = new LinkOpener(
+      testHooksEnabled ? testLinkEffects(testActions) : productionLinkEffects,
+    )
+    const openWorkspaceFile = (href: string, uri: vscode.Uri): PromiseLike<unknown> => {
+      if (testHooksEnabled) {
+        testActions.push({ type: 'open-relative', href, uri: uri.toString() })
+        return Promise.resolve()
+      }
+      return vscode.commands.executeCommand('vscode.open', uri)
+    }
     const documentKey = document.uri.toString()
     const testSession: TestSession = {
       uri: document.uri,
-      sendMessage: (msg) => onMessageReceived(msg),
+      sendMessage: (msg) => receiveUntrusted(msg),
       postMessage: (msg) => this.postMessage(webview, msg),
       getMessages: () => [...sessionMessages],
       getWebviewEvents: () => [...webviewEvents],
@@ -235,36 +253,40 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
         }
         case 'open-link': {
           const href = msg.href
-          if (/^[a-z][a-z0-9+.-]*:/i.test(href)) {
-            if (process.env.HUMAN_MARKDOWN_TEST_HOOKS === '1') {
-              testActions.push({ type: 'open-external', href })
-              break
-            }
-            vscode.env.openExternal(vscode.Uri.parse(href))
-          } else if (!href.startsWith('#')) {
-            const docDir = vscode.Uri.joinPath(document.uri, '..')
-            const targetUri = vscode.Uri.joinPath(docDir, href)
-            if (process.env.HUMAN_MARKDOWN_TEST_HOOKS === '1') {
-              testActions.push({ type: 'open-relative', href, uri: targetUri.toString() })
-              break
-            }
-            vscode.commands.executeCommand('vscode.open', targetUri)
+          const target = classifyHref(href)
+          if (target.kind === 'fragment') break
+          if (target.kind === 'external') {
+            linkOpener.openExternal(href, target.decision)
+            break
           }
+          if (!target.pathPart) break
+          const docDir = vscode.Uri.joinPath(document.uri, '..')
+          const targetUri = vscode.Uri.joinPath(docDir, target.pathPart)
+          // Links may reach sibling folders in the workspace, never outside it.
+          const root = vscode.workspace.getWorkspaceFolder(document.uri)?.uri ?? docDir
+          checkContainment(root, targetUri)
+            .then((contained) => {
+              linkOpener.openContained(href, contained, () => openWorkspaceFile(href, targetUri))
+            })
+            .catch((err) => linkOpener.fail(href, err))
           break
         }
         case 'resolve-image-uri': {
           const docDir = vscode.Uri.joinPath(document.uri, '..')
           const imageUri = vscode.Uri.joinPath(docDir, msg.src)
-          const relative = path.relative(docDir.fsPath, imageUri.fsPath)
-          if (relative.startsWith('..') || path.isAbsolute(relative)) {
-            break
-          }
-          const webviewUri = webview.asWebviewUri(imageUri).toString()
-          post({
-            type: 'image-uri-resolved',
-            src: msg.src,
-            webviewUri,
-          })
+          checkContainment(docDir, imageUri)
+            .then((contained) => {
+              if (!contained) return
+              post({
+                type: 'image-uri-resolved',
+                src: msg.src,
+                webviewUri: webview.asWebviewUri(imageUri).toString(),
+              })
+            })
+            .catch((err) => {
+              // Not user-initiated; the image simply stays unresolved, as when refused.
+              console.error('[human-markdown] image path resolution failed', msg.src, err)
+            })
           break
         }
         case 'auto-save-changed': {
@@ -284,7 +306,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       }
     }
 
-    const onMessage = webview.onDidReceiveMessage(onMessageReceived)
+    const onMessage = webview.onDidReceiveMessage(receiveUntrusted)
 
     webviewPanel.onDidDispose(() => {
       this.webviews.delete(webview)
@@ -843,6 +865,50 @@ class DocumentSyncSession {
         this.post(webview, message)
       }
     }
+  }
+}
+
+// Symlinks are only meaningful on the local filesystem; virtual filesystems
+// keep the lexical check. Never rejects: any failure counts as not contained.
+function checkContainment(root: vscode.Uri, target: vscode.Uri): Promise<boolean> {
+  if (root.scheme !== 'file' || target.scheme !== 'file') {
+    return Promise.resolve(isPathContained(root.fsPath, target.fsPath))
+  }
+  return isRealPathContained(root.fsPath, target.fsPath, realpath)
+}
+
+const productionLinkEffects: LinkOpenerEffects = {
+  openExternal: (href) => vscode.env.openExternal(vscode.Uri.parse(href)),
+  confirmExternal: (href) =>
+    vscode.window
+      .showWarningMessage(`Open this link outside VS Code?\n\n${href}`, { modal: true }, 'Open')
+      .then((choice) => choice === 'Open'),
+  warn: (message) => {
+    vscode.window.showWarningMessage(message)
+  },
+  error: (message) => {
+    vscode.window.showErrorMessage(message)
+  },
+}
+
+// Test hooks record at the same call sites production uses, so tests observe
+// which side effects a decision actually reaches. The confirm prompt declines.
+function testLinkEffects(actions: Record<string, unknown>[]): LinkOpenerEffects {
+  return {
+    openExternal: (href) => {
+      actions.push({ type: 'external-open', href })
+      return Promise.resolve()
+    },
+    confirmExternal: (href) => {
+      actions.push({ type: 'external-confirm', href })
+      return Promise.resolve(false)
+    },
+    warn: (message) => {
+      actions.push({ type: 'warn', message })
+    },
+    error: (message) => {
+      actions.push({ type: 'error', message })
+    },
   }
 }
 

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "plugin_versions": {
-    "forge": "3.9.1"
+    "forge": "3.10.0"
   },
   "rules": {
     ".claude/rules/action-auto-startup.md": {
@@ -28,6 +28,11 @@
       "source": "forge:core/behavior-extract-on-second-copy.md",
       "library_hash": "11bbd94c117df620",
       "local_hash": "11bbd94c117df620"
+    },
+    ".claude/rules/behavior-library-defaults-on-untrusted-input.md": {
+      "source": "forge:core/behavior-library-defaults-on-untrusted-input.md",
+      "library_hash": "45ef4b3900acca6e",
+      "local_hash": "45ef4b3900acca6e"
     },
     ".claude/rules/behavior-no-speculative-config.md": {
       "source": "forge:core/behavior-no-speculative-config.md",
@@ -66,8 +71,8 @@
     },
     ".claude/rules/behavior-untrusted-content-to-agents.md": {
       "source": "forge:core/behavior-untrusted-content-to-agents.md",
-      "library_hash": "e11ee53d35be1a64",
-      "local_hash": "e11ee53d35be1a64"
+      "library_hash": "7a51caa7b6eed2c8",
+      "local_hash": "7a51caa7b6eed2c8"
     },
     ".claude/rules/behavior-utc-date-construction.md": {
       "source": "forge:js-ts/behavior-utc-date-construction.md",
@@ -76,8 +81,8 @@
     },
     ".claude/rules/convention-docs-match-code.md": {
       "source": "forge:core/convention-docs-match-code.md",
-      "library_hash": "7b32607cc5f81719",
-      "local_hash": "7b32607cc5f81719"
+      "library_hash": "550957e00af891d4",
+      "local_hash": "550957e00af891d4"
     }
   },
   "opted_out": []

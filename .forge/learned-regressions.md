@@ -20,8 +20,9 @@ When a pattern hits 3+ recurrences, Crucible proposes a rule update in `rule-upd
 
 ## lazy-loader-missing-ready-event
 - **First seen:** PR #26 — `katex-loader.ts:1-2` / `math-view.ts:15-16` (round 1)
-- **Recurrences:** (none yet)
-- **Count:** 1
+- **Recurrences:**
+  - PR #144 — `webview/editor/code-block-view.ts:38-44` (round 1) — mermaid and shiki IIFEs had no ready listener; diagrams/highlighting stayed broken if they rendered before the async bundle. Round 2: the waiter then hung when the bundle never loaded (fixed via window load).
+- **Count:** 2
 - **Pattern:** When adding a new lazy-loaded IIFE bundle (the shiki/mermaid/katex pattern), the loader must dispatch a ready event and/or expose a Promise so consumers can defer rendering until the library is available. Without this, async script execution order creates a race where the node view constructs before the library loads, rendering nothing with no recovery path. The shiki-loader pattern (event + promise) is the reference implementation; new loaders that omit it silently break on cold load.
 - **Status:** active
 
@@ -159,4 +160,11 @@ When a pattern hits 3+ recurrences, Crucible proposes a rule update in `rule-upd
   - PR #143 — `src/editor-provider.ts:267-283` (round 2) — the new containment `.then` chains had no rejection handler
 - **Count:** 2
 - **Pattern:** New fire-and-forget promise chains were added without a rejection handler, twice in the same PR, even though the rule is already in `.claude/rules/behavior-catch-fire-and-forget.md`. After writing any `.then(` on a promise nobody awaits, add the `.catch` in the same edit.
+- **Status:** active
+
+## convention-loader-drift-from-adr
+- **First seen:** PR #144 — `webview/editor/shiki-loader.ts` (implementation)
+- **Recurrences:** (none yet)
+- **Count:** 1
+- **Pattern:** `shiki-loader.ts` drifted from ADR-017 (shiki/core + the JS regex engine) to the full `shiki` entry: every grammar plus the WASM engine, a 1.6MB-gzipped bundle. Because CSP `unsafe-eval` silently allowed WASM compilation, nothing failed and no test checked highlighting. When a CSP or bundle decision depends on a library configuration, add a test that fails if the configuration changes (here: CSP-violation recording plus a highlighted-block assertion).
 - **Status:** active

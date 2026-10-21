@@ -179,6 +179,7 @@ export const frontmatterView = $view(frontmatterNodeSchema.node, () => {
       ignoreMutation(mutation: { target: Node; type: string }) {
         if (rendered.contains(mutation.target)) return true
         if (header.contains(mutation.target)) return true
+        if (mutation.type === 'attributes' && mutation.target === container) return true
         return false
       },
       destroy() {

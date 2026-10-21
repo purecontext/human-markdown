@@ -25,7 +25,7 @@ TypeScript (strict), pnpm, esbuild (dual CJS/ESM), Vitest, Biome, husky + lint-s
 | `pnpm lint:fix` | Auto-fix |
 | `pnpm package` | Package as .vsix |
 | `pnpm typecheck` | Type checking |
-| `pnpm check` | Lint + typecheck + unit tests (local pre-PR gate) |
+| `pnpm check` | Lint + typecheck + build + unit tests, in CI order (local pre-PR gate) |
 
 F5 in VSCode launches the Extension Development Host for testing.
 
@@ -51,4 +51,4 @@ Unit tests with Vitest. Integration tests launch a VS Code Extension Host and ex
 
 ## Development Roadmap
 
-See `docs/plans/backlog.md` for the plan queue. The forge plugin provides development workflow skills (`/forge:next`, `/forge:ship`, `/forge:wrap`, etc.) — see `plugins/forge/README.md` for the full list.
+See `docs/plans/backlog.md` for the plan queue. The forge plugin provides development workflow skills (`/forge:next`, `/forge:ship`, `/forge:wrap`, etc.).

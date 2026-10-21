@@ -28,3 +28,7 @@ do not stream test output reliably and are not the canonical path.
 `pnpm test:integration` already builds the extension, bundles
 `test/integration/suite.ts`, enables `HUMAN_MARKDOWN_TEST_HOOKS=1`, and runs the
 full suite. Prefer fixing that script over creating one-off launch commands.
+
+To run a subset, set `HM_IT_GREP` to a substring of the test names, e.g.
+`HM_IT_GREP=mermaid pnpm test:integration`. The suite stops at its first
+failure, so use a filter when proving that a specific test catches a revert.

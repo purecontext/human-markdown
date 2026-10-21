@@ -1,27 +1,46 @@
-import type { BundledLanguage } from 'shiki'
-import { createHighlighter } from 'shiki'
+import { createJavaScriptRegexEngine } from '@shikijs/engine-javascript'
+import bash from '@shikijs/langs/bash'
+import c from '@shikijs/langs/c'
+import cpp from '@shikijs/langs/cpp'
+import css from '@shikijs/langs/css'
+import go from '@shikijs/langs/go'
+import html from '@shikijs/langs/html'
+import java from '@shikijs/langs/java'
+import javascript from '@shikijs/langs/javascript'
+import json from '@shikijs/langs/json'
+import markdown from '@shikijs/langs/markdown'
+import python from '@shikijs/langs/python'
+import rust from '@shikijs/langs/rust'
+import sql from '@shikijs/langs/sql'
+import typescript from '@shikijs/langs/typescript'
+import yaml from '@shikijs/langs/yaml'
+import githubDark from '@shikijs/themes/github-dark'
+import githubLight from '@shikijs/themes/github-light'
+import { createHighlighterCore } from 'shiki/core'
 
-const SUPPORTED_LANGUAGES: BundledLanguage[] = [
-  'javascript',
-  'typescript',
-  'json',
-  'html',
-  'css',
-  'python',
-  'bash',
-  'markdown',
-  'yaml',
-  'sql',
-  'rust',
-  'go',
-  'java',
-  'c',
-  'cpp',
-]
-
-const ready = createHighlighter({
-  themes: ['github-light', 'github-dark'],
-  langs: SUPPORTED_LANGUAGES,
+// ADR-017: shiki/core with static grammar imports and the JavaScript regex
+// engine. The default `shiki` entry bundles every grammar plus the WASM
+// Oniguruma engine, which needs 'wasm-unsafe-eval' in the CSP.
+const ready = createHighlighterCore({
+  themes: [githubLight, githubDark],
+  langs: [
+    javascript,
+    typescript,
+    json,
+    html,
+    css,
+    python,
+    bash,
+    markdown,
+    yaml,
+    sql,
+    rust,
+    go,
+    java,
+    c,
+    cpp,
+  ],
+  engine: createJavaScriptRegexEngine(),
 }).then((hl) => {
   ;(window as unknown as Record<string, unknown>).__shiki = hl
   window.dispatchEvent(new Event('shiki-ready'))

@@ -85,14 +85,14 @@ When a pattern hits 3+ recurrences, Crucible proposes a rule update in `rule-upd
 - **Recurrences:** (none yet)
 - **Count:** 1
 - **Pattern:** When a sanitization function uses a deny-list pattern (match dangerous names, then conditionally remove), a two-level conditional can create gaps where the outer pattern matches but the inner condition doesn't fire for all dangerous values. In this case, `href`/`xlink:href` matched the regex but only `javascript:` values were stripped — `data:text/html` URIs survived. Deny-list sanitizers should either strip matched attributes unconditionally or use an explicit allowlist for safe values, never a nested deny-within-deny structure.
-- **Status:** active
+- **Status:** resolved — sanitize-svg.ts replaced by a DOMPurify allowlist parsed as HTML (fix/svg-sanitizer-allowlist)
 
 ## domparser-parseerror-passthrough
 - **First seen:** PR #54 — `code-block-view.ts:22-37` (round 1)
 - **Recurrences:** (none yet)
 - **Count:** 1
 - **Pattern:** `DOMParser.parseFromString` with XML MIME types (`image/svg+xml`, `application/xml`) does not throw on malformed input — it returns a document containing a `<parsererror>` element. Code that serializes `doc.documentElement.outerHTML` without checking for parseerror passes the error markup through to innerHTML or other sinks. Always check for `doc.querySelector('parsererror')` after XML DOMParser calls.
-- **Status:** active
+- **Status:** resolved — sanitize-svg.ts replaced by a DOMPurify allowlist parsed as HTML (fix/svg-sanitizer-allowlist)
 
 ## production-exposed-webview-test-hooks
 - **First seen:** PR #104 — `webview/editor/index.ts:692-698` / `src/messages.ts:18-20` (round 1)

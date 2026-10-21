@@ -100,6 +100,13 @@ type ExtensionMessage =
 
 const vscode = acquireVsCodeApi()
 const testHooksEnabled = document.body.dataset.testHooks === 'true'
+// Integration tests assert the CSP blocks nothing the editor needs (no eval).
+const cspViolations: string[] = []
+if (testHooksEnabled) {
+  document.addEventListener('securitypolicyviolation', (event) => {
+    cspViolations.push(`${event.violatedDirective} ${event.blockedURI}`)
+  })
+}
 
 let milkdownEditor: Editor | null = null
 let cmEditor: EditorView | null = null
@@ -552,6 +559,8 @@ function redoCurrentMode() {
 function reportTestState(requestId?: number, name = 'state') {
   if (!testHooksEnabled) return
   const firstImage = previewContainer.querySelector('img')
+  const mermaidBlock = previewContainer.querySelector('.is-mermaid')
+  const mermaidSvg = mermaidBlock?.querySelector('svg')
   const findState = findBar.state
   vscode.postMessage({
     type: 'test-event',
@@ -576,6 +585,19 @@ function reportTestState(requestId?: number, name = 'state') {
     linkHrefs: Array.from(previewContainer.querySelectorAll('a')).map((link) => {
       return link.getAttribute('href') ?? ''
     }),
+    cspViolations: [...cspViolations],
+    highlightedCodeBlocks: previewContainer.querySelectorAll('.code-block-view pre.shiki').length,
+    mermaidRendered: Boolean(mermaidSvg),
+    mermaidError: mermaidBlock?.querySelector('.mermaid-error')?.textContent ?? null,
+    mermaidLabels: mermaidSvg
+      ? Array.from(mermaidSvg.querySelectorAll('foreignObject, text'))
+          .map((node) => node.textContent?.trim() ?? '')
+          .filter(Boolean)
+      : [],
+    mermaidHasStyle: Boolean(mermaidSvg?.querySelector('style')),
+    mermaidMarkers: mermaidSvg?.querySelectorAll('marker').length ?? 0,
+    mermaidMarkerRefs:
+      mermaidSvg?.querySelectorAll('[marker-end^="url(#"], [marker-start^="url(#"]').length ?? 0,
   })
 }
 

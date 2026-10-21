@@ -1199,6 +1199,98 @@ const tests: IntegrationTest[] = [
     },
   },
   {
+    name: 'mermaid diagrams survive SVG sanitization',
+    run: async () => {
+      const uri = await writeWorkspaceFile(
+        'mermaid-render.md',
+        ['```mermaid', 'flowchart LR', '  A[Start here] --> B[Finish line]', '```', ''].join('\n'),
+      )
+
+      await openHumanMarkdown(uri)
+      await waitForMilkdownReady(uri)
+      // The sanitizer must keep what Mermaid needs to draw: labels, styles, arrow markers.
+      const state = await waitForReportedWebviewState(uri, (event) => {
+        const labels = (event.mermaidLabels as string[] | undefined) ?? []
+        return Boolean(event.mermaidError) || labels.includes('Finish line')
+      })
+      assert.equal(state.mermaidError, null)
+      assert.ok((state.mermaidLabels as string[]).includes('Start here'), JSON.stringify(state))
+      assert.equal(state.mermaidHasStyle, true)
+      assert.ok(Number(state.mermaidMarkers) > 0, 'arrow markers are defined')
+      assert.ok(Number(state.mermaidMarkerRefs) > 0, 'edges still reference their markers')
+      assert.deepEqual(state.cspViolations, [])
+    },
+  },
+  {
+    name: 'code blocks are syntax highlighted under the CSP without eval or wasm',
+    run: async () => {
+      const uri = await writeWorkspaceFile(
+        'shiki-highlight.md',
+        [
+          '```cpp',
+          'std::vector<int> v; // c',
+          '```',
+          '',
+          '```python',
+          'def f(x):',
+          '    return x',
+          '```',
+          '',
+        ].join('\n'),
+      )
+      await openHumanMarkdown(uri)
+      await waitForMilkdownReady(uri)
+      const state = await waitForReportedWebviewState(uri, (event) => {
+        return Number(event.highlightedCodeBlocks) >= 2
+      })
+      assert.deepEqual(state.cspViolations, [])
+    },
+  },
+  {
+    name: 'every common mermaid diagram type renders under the CSP without unsafe-eval',
+    run: async () => {
+      const diagrams: Record<string, string[]> = {
+        sequence: ['sequenceDiagram', '  Alice->>Bob: Hello', '  Bob-->>Alice: Hi'],
+        class: ['classDiagram', '  class Animal', '  Animal <|-- Dog'],
+        state: ['stateDiagram-v2', '  [*] --> Idle', '  Idle --> Busy'],
+        er: ['erDiagram', '  CUSTOMER ||--o{ ORDER : places'],
+        gantt: ['gantt', '  dateFormat YYYY-MM-DD', '  section A', '  Task :a1, 2026-01-01, 3d'],
+        pie: ['pie', '  "Dogs" : 40', '  "Cats" : 60'],
+        journey: ['journey', '  title Day', '  section Work', '    Code: 5: Me'],
+        gitGraph: [
+          'gitGraph',
+          '  commit',
+          '  branch dev',
+          '  commit',
+          '  checkout main',
+          '  merge dev',
+        ],
+        mindmap: ['mindmap', '  root((Root))', '    Child'],
+        timeline: ['timeline', '  2025 : Start', '  2026 : Ship'],
+        quadrant: [
+          'quadrantChart',
+          '  x-axis Low --> High',
+          '  y-axis Low --> High',
+          '  A: [0.3, 0.6]',
+        ],
+        xychart: ['xychart-beta', '  x-axis [a, b, c]', '  bar [1, 2, 3]'],
+      }
+      for (const [kind, lines] of Object.entries(diagrams)) {
+        const uri = await writeWorkspaceFile(
+          `mermaid-${kind}.md`,
+          ['```mermaid', ...lines, '```', ''].join('\n'),
+        )
+        await openHumanMarkdown(uri)
+        await waitForMilkdownReady(uri)
+        const state = await waitForReportedWebviewState(uri, (event) => {
+          return Boolean(event.mermaidError) || event.mermaidRendered === true
+        })
+        assert.equal(state.mermaidError, null, `${kind}: ${state.mermaidError}`)
+        assert.deepEqual(state.cspViolations, [], `${kind} triggered a CSP violation`)
+      }
+    },
+  },
+  {
     name: 'symlinked images that point outside the document directory do not resolve',
     run: async () => {
       const folder = vscode.workspace.workspaceFolders?.[0]
@@ -1354,7 +1446,10 @@ const tests: IntegrationTest[] = [
 let nextRequestId = 1
 
 export async function run(): Promise<void> {
-  for (const test of tests) {
+  const grep = process.env.HM_IT_GREP ?? ''
+  const selected = tests.filter((test) => test.name.includes(grep))
+  assert.ok(selected.length > 0, `HM_IT_GREP=${grep} matched no tests`)
+  for (const test of selected) {
     if (test.skipReason) {
       console.log(`skip - ${test.name}: ${test.skipReason}`)
       continue

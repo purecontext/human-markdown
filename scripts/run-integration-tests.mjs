@@ -19,6 +19,8 @@ try {
     extensionTestsPath,
     extensionTestsEnv: {
       HUMAN_MARKDOWN_TEST_HOOKS: '1',
+      // Optional substring filter on test names, e.g. HM_IT_GREP=mermaid.
+      HM_IT_GREP: process.env.HM_IT_GREP ?? '',
     },
     launchArgs: [
       workspacePath,

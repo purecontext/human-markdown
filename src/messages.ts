@@ -58,6 +58,14 @@ export type WebviewToExtensionMessage =
       imageLoading?: boolean
       imageBroken?: boolean
       linkHrefs?: string[]
+      cspViolations?: string[]
+      highlightedCodeBlocks?: number
+      mermaidRendered?: boolean
+      mermaidError?: string | null
+      mermaidLabels?: string[]
+      mermaidHasStyle?: boolean
+      mermaidMarkers?: number
+      mermaidMarkerRefs?: number
     }
 
 export interface WebviewState {

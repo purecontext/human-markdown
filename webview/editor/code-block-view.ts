@@ -4,7 +4,6 @@ import { codeBlockSchema } from '@milkdown/preset-commonmark'
 import type { Node as ProsemirrorNode } from '@milkdown/prose/model'
 import type { EditorView } from '@milkdown/prose/view'
 import { renderPlainCode } from './plain-code-render'
-import { sanitizeSvg } from './sanitize-svg'
 import { observeBlock, unobserveBlock } from './viewport-observer'
 
 interface ShikiHighlighter {
@@ -27,10 +26,18 @@ function getMermaid(): MermaidApi | null {
   return (window as unknown as Record<string, unknown>).__mermaid as MermaidApi | null
 }
 
+// Set by the mermaid IIFE bundle alongside __mermaid (see mermaid-loader.ts).
+function getSvgSanitizer(): ((svg: string) => string) | null {
+  const sanitize = (window as unknown as Record<string, unknown>).__sanitizeSvg
+  return typeof sanitize === 'function' ? (sanitize as (svg: string) => string) : null
+}
+
 async function renderMermaid(source: string, container: HTMLElement): Promise<void> {
   try {
     const mermaid = getMermaid()
-    if (!mermaid) {
+    const sanitizeSvg = getSvgSanitizer()
+    // Never render an unsanitized diagram: no sanitizer means no diagram.
+    if (!mermaid || !sanitizeSvg) {
       container.textContent = 'Mermaid not available'
       container.classList.add('mermaid-error')
       return
@@ -40,6 +47,9 @@ async function renderMermaid(source: string, container: HTMLElement): Promise<vo
       mermaid.initialize({
         startOnLoad: false,
         securityLevel: 'strict',
+        // Mermaid's own defaults, stated so the bound on untrusted input is visible.
+        maxTextSize: 50000,
+        maxEdges: 500,
         theme: detectTheme() === 'github-dark' ? 'dark' : 'default',
       })
       mermaidInitialized = true

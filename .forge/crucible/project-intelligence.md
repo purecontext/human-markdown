@@ -67,7 +67,7 @@ Single file: `docs/adrs/adrs.md`.
 - **behavior-milkdown-api-boundary.md** — All editing via Milkdown plugin API; no direct ProseMirror or DOM manipulation (enforces ADR-001).
 - **behavior-round-trip-fidelity.md** — Editor must not introduce formatting changes the user didn't make (indent style, blank lines, list markers, etc.).
 - **behavior-shared-rendering-pipeline.md** — ADR-003 retired: no markdown-it pipeline. Theme tokens via CSS custom properties only, no inline styles.
-- **behavior-webview-security.md** — Strict CSP with nonces; `unsafe-eval` allowed only because Mermaid needs `Function("return this")`. Heavy libs as static IIFE `<script>` tags, not dynamic `import()`.
+- **behavior-webview-security.md** — Strict CSP with nonces only; no `unsafe-eval` or WASM (ADR-019), enforced by CSP-violation integration tests. Heavy libs as static IIFE `<script>` tags, not dynamic `import()`.
 - **convention-extension-architecture.md** — Strict boundary: `src/` is Node (no DOM), `webview/` is browser (no Node/fs/VSCode API).
 - **resume.md** — Transient session-resume note, not a durable rule (safe to ignore for review).
 
@@ -106,7 +106,7 @@ Single file: `docs/adrs/adrs.md`.
 
 - **Round-trip fidelity regressions.** Hard invariant per rule + ADR. Any change touching Milkdown plugins, Remark config, `remark-tight-lists`, or fixture handling needs verification against `webview/editor/round-trip.test.ts` + `__fixtures__/`. Past bugs hid in tight-list serialization and frontmatter handling.
 - **Bundle size budget.** `webview/editor/bundle-size.test.ts` enforces budgets. Watch for new Milkdown imports pulling in Crepe (415KB), unconditional Mermaid/KaTeX, or accidental React. Lazy-load gates (`viewport-observer.ts`, `*-loader.ts` files) must remain in place.
-- **Webview CSP / security.** Any new inline scripts, dynamic `import()` in webview, or new external resources must respect the nonce + `webview.cspSource` policy. `unsafe-eval` is intentional (Mermaid); don't broaden further. No inline styles — use CSS custom properties from `tokens.ts`.
+- **Webview CSP / security.** Any new inline scripts, dynamic `import()` in webview, or new external resources must respect the nonce + `webview.cspSource` policy. No eval or WASM in the CSP (ADR-019); don't broaden it. No inline styles — use CSS custom properties from `tokens.ts`.
 - **ADR boundary violations.** Direct ProseMirror calls outside Milkdown plugins, DOM manipulation for editing, or `WebviewPanel` usage are red flags (violate ADR-001/002). Also: anything resurrecting a markdown-it pipeline (ADR-003 retired).
 - **Host/webview context bleed.** `src/` must not import DOM types or webview modules; `webview/` must not import `vscode` or Node builtins. Convention is enforced socially, not by tsconfig project refs.
 - **Raw-mode / toggle edge cases.** Recent fixes (#22, #25, dirty-state in #24) suggest the toggle + external-edit path is fragile. Scrutinize changes to `editor-provider.ts` lifecycle, `vscode.openWith` flow, and CodeMirror raw editor mount/unmount.

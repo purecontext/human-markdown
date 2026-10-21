@@ -1,5 +1,7 @@
 {
-  "plugin_version": "2.0.1",
+  "plugin_versions": {
+    "forge": "3.9.1"
+  },
   "version": 1,
   "gates": [
     {
@@ -7,35 +9,111 @@
       "instruction": "Every function with a catch block or early-return guard — verify the caller can distinguish failure from a legitimate empty result. Prefer throwing or pushing to an error channel over silent defaults (returning [] or null on error).",
       "triggers": ["next"],
       "severity": "block",
-      "detection": "always"
+      "detection": "always",
+      "source": "forge"
     },
     {
       "id": "fault-isolation-symmetry",
       "instruction": "When writing a collection-processing function, check if sibling functions of the same shape exist. Use the same fault-isolation pattern — if one has per-item try/catch, the other should too.",
       "triggers": ["next"],
       "severity": "warn",
-      "detection": "always"
+      "detection": "always",
+      "source": "forge"
     },
     {
       "id": "async-state-timing",
       "instruction": "Guard flags and state updates must happen at the right time relative to async operations. Set guard flags after the operation succeeds (or clean up in finally). Don't update UI state (dirty flags, base content, progress indicators) before the async call confirms.",
       "triggers": ["next"],
       "severity": "block",
-      "detection": "always"
+      "detection": "always",
+      "source": "forge"
     },
     {
       "id": "error-path-tests",
       "instruction": "After writing tests, verify each new catch/error path has a test that triggers it. If the error handling code can be deleted without a test failing, add a test.",
-      "triggers": ["next", "ship"],
+      "triggers": ["next"],
       "severity": "block",
-      "detection": "always"
+      "detection": "always",
+      "source": "forge"
     },
     {
       "id": "api-contract-completeness",
       "instruction": "Functions called from API endpoints or CLI commands must either throw on failure or return a distinguishable error state. Don't resolve successfully with internal-only error accounting.",
       "triggers": ["next"],
       "severity": "block",
-      "detection": "always"
+      "detection": "always",
+      "source": "forge"
+    },
+    {
+      "id": "doc-count-verification",
+      "instruction": "When writing a number into a markdown file that claims to count something (methods, tests, properties, branches, fields, hooks, steps), grep the source and verify the count before the write completes. When writing a list that reads as complete ('all callers', 'covers steps 1-5', 'every hook'), count against the source of truth. If the count can't be verified mechanically, qualify it ('as of v1.2', 'not exhaustive').",
+      "triggers": ["next"],
+      "severity": "block",
+      "detection": "always",
+      "source": "forge"
+    },
+    {
+      "id": "local-server-guard",
+      "instruction": "When the diff adds or changes a network listener, route, static handler, or WebSocket/upgrade handler: the server binds 127.0.0.1 unless LAN access is a recorded decision, one request guard (Host allowlist, Origin allowlist when present, Sec-Fetch-Site refusing cross-site and same-site) runs before every route, static file, and upgrade, and a test sends a rebinding Host and gets refused. CORS config is not a guard. See behavior-localhost-browser-request-guard.",
+      "triggers": ["next"],
+      "severity": "block",
+      "detection": "always",
+      "source": "forge"
+    },
+    {
+      "id": "input-derived-paths-and-spawns",
+      "instruction": "When the diff builds a filesystem path or process arguments from request input, stored config, or a scanned directory: paths go through one resolve-and-contain helper (realpath, then refuse anything outside the root); processes use spawn/execFile with an argument array and no shell, and every input-derived argument is validated against its source of truth (e.g. package.json scripts) at spawn time. See behavior-path-containment and behavior-safe-process-spawn.",
+      "triggers": ["next"],
+      "severity": "block",
+      "detection": "always",
+      "source": "forge"
+    },
+    {
+      "id": "boundary-input-validation",
+      "instruction": "Every new or changed route, MCP tool, or CLI entry parses its body, query, params, and arguments with a schema (zod or equivalent) and rejects what fails with a 4xx or a tool error. Never coerce with bare Number()/unary +, and never pass unparsed input deeper.",
+      "triggers": ["next"],
+      "severity": "block",
+      "detection": "always",
+      "source": "forge"
+    },
+    {
+      "id": "ssrf-fetch-from-input",
+      "instruction": "When server or tool code fetches a URL, host, or path that came from input or from fetched content: allowlist the scheme (https, and http only where intended) and host, and refuse loopback, link-local, and private ranges after DNS resolution unless that target is the point. Follow redirects only with the same checks.",
+      "triggers": ["next"],
+      "severity": "block",
+      "detection": "always",
+      "source": "forge"
+    },
+    {
+      "id": "untrusted-content-render",
+      "instruction": "Content the app didn't author (email, markdown, web pages, file contents, tool output) rendered as HTML goes through a sanitizer, never raw innerHTML/dangerouslySetInnerHTML/v-html/unsafeHTML. Webviews and Electron/Tauri windows set a strict Content-Security-Policy with no 'unsafe-inline' scripts, and message handlers from the page validate every message before acting on it.",
+      "triggers": ["next"],
+      "severity": "warn",
+      "detection": {
+        "dependencies": [
+          "react-dom",
+          "svelte",
+          "vue",
+          "lit",
+          "preact",
+          "solid-js",
+          "marked",
+          "markdown-it",
+          "@types/vscode"
+        ]
+      },
+      "source": "forge"
+    },
+    {
+      "id": "dependency-install-scripts",
+      "instruction": "When the diff adds or upgrades a dependency: the lockfile is updated and committed, the version is pinned per tech preferences, and any new install/postinstall script is approved explicitly (pnpm approve-builds or onlyBuiltDependencies) after checking what it runs. Never approve all builds wholesale.",
+      "triggers": ["next"],
+      "severity": "warn",
+      "detection": {
+        "files": ["package.json"]
+      },
+      "source": "forge"
     }
-  ]
+  ],
+  "custom": []
 }

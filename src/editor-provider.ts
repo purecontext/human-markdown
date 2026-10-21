@@ -264,22 +264,29 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
           const targetUri = vscode.Uri.joinPath(docDir, target.pathPart)
           // Links may reach sibling folders in the workspace, never outside it.
           const root = vscode.workspace.getWorkspaceFolder(document.uri)?.uri ?? docDir
-          checkContainment(root, targetUri).then((contained) => {
-            linkOpener.openContained(href, contained, () => openWorkspaceFile(href, targetUri))
-          })
+          checkContainment(root, targetUri)
+            .then((contained) => {
+              linkOpener.openContained(href, contained, () => openWorkspaceFile(href, targetUri))
+            })
+            .catch((err) => linkOpener.fail(href, err))
           break
         }
         case 'resolve-image-uri': {
           const docDir = vscode.Uri.joinPath(document.uri, '..')
           const imageUri = vscode.Uri.joinPath(docDir, msg.src)
-          checkContainment(docDir, imageUri).then((contained) => {
-            if (!contained) return
-            post({
-              type: 'image-uri-resolved',
-              src: msg.src,
-              webviewUri: webview.asWebviewUri(imageUri).toString(),
+          checkContainment(docDir, imageUri)
+            .then((contained) => {
+              if (!contained) return
+              post({
+                type: 'image-uri-resolved',
+                src: msg.src,
+                webviewUri: webview.asWebviewUri(imageUri).toString(),
+              })
             })
-          })
+            .catch((err) => {
+              // Not user-initiated; the image simply stays unresolved, as when refused.
+              console.error('[human-markdown] image path resolution failed', msg.src, err)
+            })
           break
         }
         case 'auto-save-changed': {

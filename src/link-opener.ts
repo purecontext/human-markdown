@@ -67,7 +67,8 @@ export class LinkOpener {
     }
   }
 
-  private fail(href: string, err: unknown): void {
+  // Public so callers that decide containment asynchronously can report through the same channel.
+  fail(href: string, err: unknown): void {
     this.effects.error(`Human Markdown could not open ${href}: ${err}`)
   }
 }

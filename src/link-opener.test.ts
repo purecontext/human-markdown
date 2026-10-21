@@ -98,6 +98,16 @@ describe('LinkOpener.openExternal', () => {
   })
 })
 
+describe('LinkOpener.fail', () => {
+  it('reports through the error effect with the href', () => {
+    const { effects, opener } = setup()
+    opener.fail('docs/a.md', new Error('containment broke'))
+    expect(effects.error).toHaveBeenCalledWith(
+      expect.stringMatching(/docs\/a\.md.*containment broke/),
+    )
+  })
+})
+
 describe('LinkOpener.openContained', () => {
   it('opens a contained file', async () => {
     const { effects, opener } = setup()

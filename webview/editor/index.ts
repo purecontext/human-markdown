@@ -339,10 +339,6 @@ async function initMilkdown(content: string) {
           // the dirty-detection baseline (all go through normalizeSerializedMarkdown).
           const markdown = normalizeSerializedMarkdown(rawMarkdown)
           if (ignoredMarkdownSnapshots.delete(markdown)) return
-          // Listener updates are debounced. If undo/redo or another edit changed
-          // the document after this snapshot was queued, do not let stale bytes
-          // overwrite the live editor state or the backing TextDocument.
-          if (milkdownEditor && markdown !== serializeWysiwygDoc(milkdownEditor)) return
           // The markdownUpdated listener is debounced (200ms in plugin-listener),
           // so it outlives the synchronous suppress flags and fires for the echo
           // of a programmatic load (mode toggle or external update). That echo is

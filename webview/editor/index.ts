@@ -101,11 +101,11 @@ type ExtensionMessage =
 const vscode = acquireVsCodeApi()
 const testHooksEnabled = document.body.dataset.testHooks === 'true'
 // Integration tests assert the CSP blocks nothing the editor needs (no eval).
-const cspViolations: string[] = []
-if (testHooksEnabled) {
-  document.addEventListener('securitypolicyviolation', (event) => {
-    cspViolations.push(`${event.violatedDirective} ${event.blockedURI}`)
-  })
+// The test-only recorder (test/integration/csp-recorder.ts) runs before the
+// async bundles; a missing recorder is reported so the assertion can't pass vacuously.
+function getCspViolations(): string[] {
+  const recorded = (window as unknown as Record<string, unknown>).__cspViolations
+  return Array.isArray(recorded) ? [...recorded] : ['csp-recorder-missing']
 }
 
 let milkdownEditor: Editor | null = null
@@ -585,7 +585,7 @@ function reportTestState(requestId?: number, name = 'state') {
     linkHrefs: Array.from(previewContainer.querySelectorAll('a')).map((link) => {
       return link.getAttribute('href') ?? ''
     }),
-    cspViolations: [...cspViolations],
+    cspViolations: getCspViolations(),
     highlightedCodeBlocks: previewContainer.querySelectorAll('.code-block-view pre.shiki').length,
     mermaidRendered: Boolean(mermaidSvg),
     mermaidError: mermaidBlock?.querySelector('.mermaid-error')?.textContent ?? null,

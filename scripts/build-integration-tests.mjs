@@ -11,4 +11,13 @@ await esbuild.build({
   sourcemap: true,
 })
 
+await esbuild.build({
+  entryPoints: ['test/integration/csp-recorder.ts'],
+  bundle: true,
+  outfile: 'dist/integration/csp-recorder.js',
+  format: 'iife',
+  platform: 'browser',
+  target: 'es2022',
+})
+
 console.log('Integration test bundle complete.')

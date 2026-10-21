@@ -48,5 +48,5 @@ Each IIFE bundle requires specific esbuild settings:
 
 ## Related Decisions
 
-- [ADR-011](011-csp-unsafe-eval-mermaid.md): Mermaid requires `unsafe-eval` in CSP
+- [ADR-019](019-csp-without-unsafe-eval.md): the IIFE bundles run under a CSP without `unsafe-eval` (supersedes ADR-011)
 - [ADR-017](017-shiki-selective-grammars.md): Shiki bundle size optimization

@@ -19,7 +19,7 @@ Whether ADR-011's original crash came from an older Mermaid or from this Shiki p
 - Remove `'unsafe-eval'` from the webview CSP. `script-src` is nonce plus `webview.cspSource` only.
 - Restore ADR-017's design in `shiki-loader.ts`: `shiki/core`, static imports from `@shikijs/langs` and `@shikijs/themes`, and `createJavaScriptRegexEngine()` in its strict mode. For all 15 configured languages, the strict JS engine's tokens match the Oniguruma engine's.
 - Guard both with integration tests:
-  - With test hooks on, the webview records every `securitypolicyviolation`.
+  - With test hooks on, a synchronous recorder script (`test/integration/csp-recorder.ts`, built only into `dist/integration`) loads before the async library bundles and records every `securitypolicyviolation`, including any raised while a bundle evaluates.
   - The tests require zero violations, highlighted code blocks, and rendered diagrams across the diagram types above.
 
 ## Alternatives Considered

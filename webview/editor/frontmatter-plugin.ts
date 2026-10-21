@@ -3,6 +3,7 @@ import type { Node as ProsemirrorNode } from '@milkdown/prose/model'
 import type { EditorView } from '@milkdown/prose/view'
 import remarkFrontmatter from 'remark-frontmatter'
 import { detectTheme, getShikiHighlighter } from './code-block-view'
+import { createLibraryWaiter } from './library-ready'
 import { renderPlainCode } from './plain-code-render'
 
 let collapsed = false
@@ -84,6 +85,9 @@ export const frontmatterView = $view(frontmatterNodeSchema.node, () => {
     container.appendChild(body)
 
     let lastText = node.textContent
+    const libraryWaiter = createLibraryWaiter(() => {
+      if (!container.classList.contains('editing')) updateRendered()
+    })
 
     function updateRendered(text?: string) {
       const content = text ?? code.textContent ?? lastText
@@ -95,7 +99,10 @@ export const frontmatterView = $view(frontmatterNodeSchema.node, () => {
       renderPlainCode(rendered, content)
 
       const ready = getShikiHighlighter()
-      if (!ready) return
+      if (!ready) {
+        libraryWaiter.wait('shiki-ready')
+        return
+      }
       ready
         .then((hl) => {
           if (container.classList.contains('editing')) return
@@ -185,6 +192,7 @@ export const frontmatterView = $view(frontmatterNodeSchema.node, () => {
       },
       destroy() {
         window.removeEventListener('theme-changed', onThemeChanged)
+        libraryWaiter.dispose()
       },
     }
   }

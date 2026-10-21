@@ -3,12 +3,13 @@ import { $view } from '@milkdown/kit/utils'
 import { codeBlockSchema } from '@milkdown/preset-commonmark'
 import type { Node as ProsemirrorNode } from '@milkdown/prose/model'
 import type { EditorView } from '@milkdown/prose/view'
+import { createLibraryWaiter } from './library-ready'
 import { renderPlainCode } from './plain-code-render'
-import { sanitizeSvg } from './sanitize-svg'
 import { observeBlock, unobserveBlock } from './viewport-observer'
 
-interface ShikiHighlighter {
+export interface ShikiHighlighter {
   codeToHtml(code: string, options: { lang: string; theme: string }): string
+  getLoadedLanguages(): string[]
 }
 
 interface MermaidApi {
@@ -27,10 +28,18 @@ function getMermaid(): MermaidApi | null {
   return (window as unknown as Record<string, unknown>).__mermaid as MermaidApi | null
 }
 
+// Set by the mermaid IIFE bundle alongside __mermaid (see mermaid-loader.ts).
+function getSvgSanitizer(): ((svg: string) => string) | null {
+  const sanitize = (window as unknown as Record<string, unknown>).__sanitizeSvg
+  return typeof sanitize === 'function' ? (sanitize as (svg: string) => string) : null
+}
+
 async function renderMermaid(source: string, container: HTMLElement): Promise<void> {
   try {
     const mermaid = getMermaid()
-    if (!mermaid) {
+    const sanitizeSvg = getSvgSanitizer()
+    // Never render an unsanitized diagram: no sanitizer means no diagram.
+    if (!mermaid || !sanitizeSvg) {
       container.textContent = 'Mermaid not available'
       container.classList.add('mermaid-error')
       return
@@ -40,6 +49,9 @@ async function renderMermaid(source: string, container: HTMLElement): Promise<vo
       mermaid.initialize({
         startOnLoad: false,
         securityLevel: 'strict',
+        // Mermaid's own defaults, stated so the bound on untrusted input is visible.
+        maxTextSize: 50000,
+        maxEdges: 500,
         theme: detectTheme() === 'github-dark' ? 'dark' : 'default',
       })
       mermaidInitialized = true
@@ -148,6 +160,17 @@ export const codeBlockView = $view(codeBlockSchema.node, (_ctx: Ctx) => {
     }
 
     let lastText = node.textContent
+    const libraryWaiter = createLibraryWaiter(
+      () => {
+        if (!container.classList.contains('editing')) updateRendered()
+      },
+      () => {
+        // Code blocks keep their plain render; a diagram has nothing to show.
+        if (!isMermaid || !rendered) return
+        rendered.textContent = 'Mermaid not available'
+        rendered.classList.add('mermaid-error')
+      },
+    )
 
     function updateRendered(text?: string) {
       const content = text ?? code.textContent ?? lastText
@@ -159,6 +182,11 @@ export const codeBlockView = $view(codeBlockSchema.node, (_ctx: Ctx) => {
       lastText = content
 
       if (isMermaid) {
+        if (!getMermaid() || !getSvgSanitizer()) {
+          rendered.textContent = 'Loading diagram…'
+          libraryWaiter.wait('mermaid-ready')
+          return
+        }
         renderMermaid(content, rendered)
       } else {
         renderPlainCode(rendered, content)
@@ -169,23 +197,33 @@ export const codeBlockView = $view(codeBlockSchema.node, (_ctx: Ctx) => {
     function applyShikiHighlighting(content: string, lang: string, target: HTMLElement) {
       if (!lang) return
       const ready = getShikiHighlighter()
-      if (!ready) return
-      ready.then((hl) => {
-        if (target.closest('.editing')) return
-        const highlighted = hl.codeToHtml(content, {
-          lang,
-          theme: detectTheme(),
+      if (!ready) {
+        libraryWaiter.wait('shiki-ready')
+        return
+      }
+      ready
+        .then((hl) => {
+          if (target.closest('.editing')) return
+          // Fence info is document text; unknown languages keep the plain render.
+          const id = lang.toLowerCase()
+          if (!hl.getLoadedLanguages().includes(id)) return
+          const highlighted = hl.codeToHtml(content, {
+            lang: id,
+            theme: detectTheme(),
+          })
+          const temp = document.createElement('div')
+          temp.innerHTML = highlighted
+          const newPre = temp.querySelector('pre')
+          if (newPre) {
+            newPre.style.background = 'none'
+            newPre.removeAttribute('tabindex')
+            target.replaceChildren(newPre)
+          }
         })
-        const temp = document.createElement('div')
-        temp.innerHTML = highlighted
-        const newPre = temp.querySelector('pre')
-        if (newPre) {
-          newPre.style.background = 'none'
-          newPre.removeAttribute('tabindex')
-          target.innerHTML = ''
-          target.appendChild(newPre)
-        }
-      })
+        .catch((err) => {
+          // The plain rendering stays in place; only highlighting is lost.
+          console.warn('[human-markdown] code highlighting failed', err)
+        })
     }
 
     if (isMermaid) {
@@ -232,6 +270,7 @@ export const codeBlockView = $view(codeBlockSchema.node, (_ctx: Ctx) => {
       destroy() {
         if (resetTimer) clearTimeout(resetTimer)
         window.removeEventListener('theme-changed', onThemeChanged)
+        libraryWaiter.dispose()
         if (isMermaid) unobserveBlock(container)
       },
     }

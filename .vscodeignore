@@ -20,6 +20,7 @@ CLAUDE.md
 mock.html
 hand-drawn-border*.svg
 dist/**/*.map
+dist/integration/**
 *.vsix
 .DS_Store
 .mcp.json

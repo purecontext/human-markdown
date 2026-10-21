@@ -1,7 +1,7 @@
 # Webview Security
 
 Every webview must set a strict Content Security Policy:
-- `script-src` uses nonces, `webview.cspSource`, and `unsafe-eval` — no inline scripts, no `javascript:` URIs. `unsafe-eval` is required because mermaid's dependency tree uses `Function("return this")` to resolve the global object (ADR-011). Heavy libraries (mermaid) are loaded as separate IIFE bundles via static `<script>` tags, not dynamic `import()` (which doesn't work in `vscode-webview://`).
+- `script-src` uses nonces and `webview.cspSource` only: no `unsafe-eval`, no `wasm-unsafe-eval`, no inline scripts, no `javascript:` URIs (ADR-019). Integration tests fail on any `securitypolicyviolation`; a library that needs eval or WASM must justify a CSP change in a new ADR. Shiki uses the JS regex engine (ADR-017). Heavy libraries (mermaid) are loaded as separate IIFE bundles via static `<script>` tags, not dynamic `import()` (which doesn't work in `vscode-webview://`).
 - `style-src` allows inline styles (needed for theme CSS custom properties)
 - No `connect-src` — no network requests from the webview
 
@@ -15,6 +15,6 @@ The webview renders untrusted markdown (cloned READMEs, PR branches), so assume 
 
 ## Rendering hygiene
 
-Render document text as text: `renderPlainCode` (`webview/editor/plain-code-render.ts`) or `textContent`, never string-built markup. `innerHTML` takes only the output of a renderer that escapes or sanitizes its input: Shiki, KaTeX in strict mode, Mermaid with `securityLevel: 'strict'`, or `sanitizeSvg`.
+Render document text as text: `renderPlainCode` (`webview/editor/plain-code-render.ts`) or `textContent`, never string-built markup. `innerHTML` takes only the output of a renderer that escapes or sanitizes its input: Shiki, KaTeX in strict mode, or Mermaid SVG after the DOMPurify allowlist in `sanitize-svg.ts` (which runs inside the Mermaid bundle).
 
 Each sink that handles untrusted markup keeps adversarial tests next to it: the SVG sanitizer, frontmatter escaping, the message guard, and the link policy. Output containing `<script`, `onerror`, `javascript:`, or an unescaped event-handler attribute fails the test. A new sink gets its own tests in the same PR.

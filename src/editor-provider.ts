@@ -483,6 +483,19 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
       vscode.Uri.joinPath(this.context.extensionUri, 'dist', 'katex.js'),
     )
     const nonce = getNonce()
+    // Test-only: a synchronous CSP-violation recorder that runs before the
+    // async bundles. Built into dist/integration, which never ships.
+    const cspRecorderTag =
+      process.env.HUMAN_MARKDOWN_TEST_HOOKS === '1'
+        ? `<script nonce="${nonce}" src="${webview.asWebviewUri(
+            vscode.Uri.joinPath(
+              this.context.extensionUri,
+              'dist',
+              'integration',
+              'csp-recorder.js',
+            ),
+          )}"></script>`
+        : ''
 
     const editorConfig = vscode.workspace.getConfiguration('editor')
     const fontFamily = editorConfig.get<string>(
@@ -502,7 +515,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'none'; img-src ${webview.cspSource} https: data:; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' ${webview.cspSource} 'unsafe-eval'; font-src ${webview.cspSource};">
+    content="default-src 'none'; img-src ${webview.cspSource} https: data:; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' ${webview.cspSource}; font-src ${webview.cspSource};">
   <title>Human Markdown</title>
   <link rel="stylesheet" href="${styleUri}">
 </head>
@@ -524,6 +537,7 @@ export class MarkdownEditorProvider implements vscode.CustomTextEditorProvider {
     <div id="editor"></div>
   </div>
   <div id="codemirror-container"></div>
+  ${cspRecorderTag}
   <script nonce="${nonce}" async src="${mermaidUri}"></script>
   <script nonce="${nonce}" async src="${shikiUri}"></script>
   <script nonce="${nonce}" async src="${katexUri}"></script>

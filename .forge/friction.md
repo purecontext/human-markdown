@@ -9,3 +9,8 @@
 **Friction:** Crucible took 3 rounds. Round 1 found 5 fix-now items: a drive-letter scheme bypass, unbounded confirm modals, a missing `.catch`, a test seam above the side effects, and lexical-only containment. Round 2 found 2 more missing `.catch`es that round 1's fix had introduced.
 **Root cause:** The test-hook branch returned before the side effects, so the integration tests proved only classification. Containment was designed lexically, without considering committed symlinks. The scheme regex wasn't checked against Windows paths. Fire-and-forget chains were written without the catch the rule requires.
 **Category:** crucible-rework
+
+## 2026-10-21 — fix/svg-sanitizer-allowlist
+**Friction:** Crucible took 3 rounds plus a post-approval check. Round 1: no ready events for the lazy loaders, a CSP recorder that started too late, an uncaught Shiki highlighting promise, and ADR drift. Round 2: the new waiter hung when a bundle failed. During implementation, `pnpm dedupe` re-resolved Milkdown's tree and broke 7 round-trip tests; the lockfile was reverted and the upgrades redone as targeted adds.
+**Root cause:** The lazy-loading ordering wasn't modelled when the fail-closed sanitizer check was added. `pnpm dedupe` was run as tidy-up without measuring its scope.
+**Category:** crucible-rework

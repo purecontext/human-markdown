@@ -224,8 +224,12 @@
     "@milkdown/preset-commonmark": "^7.21.2",
     "@milkdown/preset-gfm": "^7.21.2",
     "@milkdown/prose": "^7.21.2",
+    "@shikijs/engine-javascript": "4.2.0",
+    "@shikijs/langs": "4.2.0",
+    "@shikijs/themes": "4.2.0",
+    "dompurify": "^3.4.17",
     "katex": "^0.17.0",
-    "mermaid": "^11.15.0",
+    "mermaid": "^11.17.2",
     "shiki": "^4.2.0"
   },
   "pnpm": {

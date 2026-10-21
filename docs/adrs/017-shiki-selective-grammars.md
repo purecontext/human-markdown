@@ -10,7 +10,7 @@ Shiki provides syntax highlighting for code blocks and frontmatter. The full Shi
 
 ## Decision
 
-Use `shiki/core` with the JavaScript regex engine and 12 explicitly imported language grammars: bash, css, html, javascript, json, markdown, python, rust, sql, typescript, yaml, and go. Two themes (light and dark).
+Use `shiki/core` with the JavaScript regex engine and explicitly imported language grammars, originally 12: bash, css, html, javascript, json, markdown, python, rust, sql, typescript, yaml, and go. java, c and cpp were added later, for 15 (see `webview/editor/shiki-loader.ts`). Two themes (light and dark).
 
 ## Alternatives Considered
 
@@ -25,11 +25,11 @@ Use `shiki/core` with the JavaScript regex engine and 12 explicitly imported lan
 
 - Webview bundle: 2.1MB raw / 393KB gzipped (down from 10MB / 1.8MB)
 - JS regex engine avoids WASM CSP requirements
-- 12 grammars cover the most common languages in markdown documentation
+- The imported grammars (15 as of ADR-019) cover the most common languages in markdown documentation
 
 ### Negative
 
-- Languages outside the 12 render as plain text without highlighting
+- Languages outside the imported set render as plain text without highlighting
 - Adding new grammars requires a code change and rebuild (no runtime loading)
 - JS regex engine has minor differences from Oniguruma for edge-case grammar patterns (not observed in practice with the selected grammars)
 

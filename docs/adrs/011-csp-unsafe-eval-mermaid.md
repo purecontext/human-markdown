@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by [ADR-019](019-csp-without-unsafe-eval.md)
 
 ## Context
 

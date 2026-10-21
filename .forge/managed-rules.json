@@ -1,7 +1,7 @@
 {
   "version": 1,
   "plugin_versions": {
-    "forge": "3.10.0"
+    "forge": "3.10.1"
   },
   "rules": {
     ".claude/rules/action-auto-startup.md": {

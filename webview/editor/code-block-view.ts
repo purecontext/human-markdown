@@ -3,6 +3,7 @@ import { $view } from '@milkdown/kit/utils'
 import { codeBlockSchema } from '@milkdown/preset-commonmark'
 import type { Node as ProsemirrorNode } from '@milkdown/prose/model'
 import type { EditorView } from '@milkdown/prose/view'
+import { renderPlainCode } from './plain-code-render'
 import { sanitizeSvg } from './sanitize-svg'
 import { observeBlock, unobserveBlock } from './viewport-observer'
 
@@ -62,10 +63,6 @@ export function detectTheme(): 'github-light' | 'github-dark' {
     return Number.isNaN(r) || r < 128 ? 'github-dark' : 'github-light'
   }
   return 'github-light'
-}
-
-function escapeHtml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 export const codeBlockView = $view(codeBlockSchema.node, (_ctx: Ctx) => {
@@ -164,7 +161,7 @@ export const codeBlockView = $view(codeBlockSchema.node, (_ctx: Ctx) => {
       if (isMermaid) {
         renderMermaid(content, rendered)
       } else {
-        rendered.innerHTML = `<pre><code>${escapeHtml(content)}</code></pre>`
+        renderPlainCode(rendered, content)
         applyShikiHighlighting(content, currentLang, rendered)
       }
     }

@@ -3,7 +3,7 @@ import type { Node as ProsemirrorNode } from '@milkdown/prose/model'
 import type { EditorView } from '@milkdown/prose/view'
 import remarkFrontmatter from 'remark-frontmatter'
 import { detectTheme, getShikiHighlighter } from './code-block-view'
-import { renderPlainFrontmatter } from './frontmatter-render'
+import { renderPlainCode } from './plain-code-render'
 
 let collapsed = false
 let syncState: ((collapsed: boolean) => void) | null = null
@@ -92,7 +92,7 @@ export const frontmatterView = $view(frontmatterNodeSchema.node, () => {
         return
       }
       lastText = content
-      renderPlainFrontmatter(rendered, content)
+      renderPlainCode(rendered, content)
 
       const ready = getShikiHighlighter()
       if (!ready) return

@@ -14,6 +14,6 @@ The webview renders untrusted markdown (cloned READMEs, PR branches), so assume 
 
 ## Rendering hygiene
 
-Escape all frontmatter values before rendering. Never use `innerHTML` with user-provided data — use DOM APIs or a sanitization library. Run Mermaid with `securityLevel: 'strict'` and KaTeX in strict mode; both parse untrusted input.
+Render document text as text: `renderPlainCode` (`webview/editor/plain-code-render.ts`) or `textContent`, never string-built markup. `innerHTML` takes only the output of a renderer that escapes or sanitizes its input: Shiki, KaTeX in strict mode, Mermaid with `securityLevel: 'strict'`, or `sanitizeSvg`.
 
 Each sink that handles untrusted markup keeps adversarial tests next to it: the SVG sanitizer, frontmatter escaping, the message guard, and the link policy. Output containing `<script`, `onerror`, `javascript:`, or an unescaped event-handler attribute fails the test. A new sink gets its own tests in the same PR.

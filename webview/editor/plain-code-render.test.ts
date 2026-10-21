@@ -1,16 +1,16 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
-import { renderPlainFrontmatter } from './frontmatter-render'
+import { renderPlainCode } from './plain-code-render'
 
-describe('renderPlainFrontmatter', () => {
+describe('renderPlainCode', () => {
   it.each([
     'title: </code></pre><img src=x onerror="alert(1)">',
     'title: <script>alert(1)</script>',
     'link: <a href="javascript:alert(1)">x</a>',
     'svg: <svg onload="alert(1)"></svg>',
-  ])('renders hostile frontmatter as inert text: %s', (content) => {
+  ])('renders hostile document text as inert text: %s', (content) => {
     const target = document.createElement('div')
-    renderPlainFrontmatter(target, content)
+    renderPlainCode(target, content)
 
     expect(target.querySelectorAll('pre > code')).toHaveLength(1)
     expect(target.querySelector('code')?.textContent).toBe(content)
@@ -24,8 +24,8 @@ describe('renderPlainFrontmatter', () => {
 
   it('replaces previous content instead of appending', () => {
     const target = document.createElement('div')
-    renderPlainFrontmatter(target, 'a: 1')
-    renderPlainFrontmatter(target, 'b: 2')
+    renderPlainCode(target, 'a: 1')
+    renderPlainCode(target, 'b: 2')
     expect(target.children).toHaveLength(1)
     expect(target.textContent).toBe('b: 2')
   })

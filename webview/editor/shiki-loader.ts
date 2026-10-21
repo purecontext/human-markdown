@@ -41,9 +41,9 @@ const ready = createHighlighterCore({
     cpp,
   ],
   engine: createJavaScriptRegexEngine(),
-}).then((hl) => {
-  ;(window as unknown as Record<string, unknown>).__shiki = hl
-  window.dispatchEvent(new Event('shiki-ready'))
-  return hl
 })
 ;(window as unknown as Record<string, unknown>).__shikiReady = ready
+// Announce synchronously, as soon as the promise exists: views waiting on this
+// event then chain on __shikiReady themselves. Firing it after the highlighter
+// resolves could land after window load, which waiters treat as "unavailable".
+window.dispatchEvent(new Event('shiki-ready'))

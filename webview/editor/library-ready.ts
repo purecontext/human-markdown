@@ -5,6 +5,8 @@
 // Async scripts delay the window load event, so a view still waiting after
 // load will never be served: the bundle failed to load or threw. onUnavailable
 // lets the view replace its loading state with an error instead of hanging.
+// Loaders must therefore dispatch their ready event synchronously while the
+// bundle runs, never after an await.
 export function createLibraryWaiter(onReady: () => void, onUnavailable: () => void = () => {}) {
   let pending: { event: string; ready: () => void; loaded: () => void } | null = null
 

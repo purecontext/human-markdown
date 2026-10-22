@@ -1,12 +1,13 @@
 # Session Resume Context
 
 ## Working on
-Fixing bugs reported by felixontv (issues #133, #134, #135)
+Nothing in flight. The October 2026 security sweep is done: PRs #142–#144 merged and all `[Forge]` tickets closed.
 
 ## Completed
-- Investigated all three issues from felixontv against Cursor previewer-swap hypothesis — none are Cursor-related (user is on VS Code on Linux)
-- Fixed #135 (checkbox save failure): stale-content guard in `saveWebviewContent` rejected source-spliced saves from the same webview. Added `lastAppliedSource` tracking so the guard only rejects saves from a *different* webview panel.
+- #142: `pnpm check` gate in CI order, Biome reads `.gitignore`, Forge gates and rules synced.
+- #143: the webview→host boundary (message guard, link scheme policy, symlink-aware containment).
+- #144: DOMPurify allowlist SVG sanitizer, `unsafe-eval` removed from the CSP (ADR-019), Shiki back on ADR-017, Mermaid 11.17.2.
 
 ## Next
-- #134 (frontmatter/H1 edits intermittently not registered): likely a timing window in the `markdownUpdated` listener guards. Needs investigation of the debounce + guard flag interaction.
-- #133 (git diff gutter missing): known platform limitation — VS Code diff decorations are a TextEditor/Monaco feature, not available in CustomTextEditorProvider webviews. Document as a known limitation.
+- Low-severity follow-ups in purecontext-tasks: refused images stuck in `image-loading`; KaTeX ^0.18.2; the `@vue/server-renderer` advisory (check whether it's bundled first).
+- #133 (no git diff gutter) is a known platform limitation of CustomTextEditorProvider webviews.

@@ -24,7 +24,7 @@ When a pattern hits 3+ recurrences, Crucible proposes a rule update in `rule-upd
   - PR #144 — `webview/editor/code-block-view.ts:38-44` (round 1) — mermaid and shiki IIFEs had no ready listener; diagrams/highlighting stayed broken if they rendered before the async bundle. Round 2: the waiter then hung when the bundle never loaded (fixed via window load).
 - **Count:** 2
 - **Pattern:** When adding a new lazy-loaded IIFE bundle (the shiki/mermaid/katex pattern), the loader must dispatch a ready event and/or expose a Promise so consumers can defer rendering until the library is available. Without this, async script execution order creates a race where the node view constructs before the library loads, rendering nothing with no recovery path. The shiki-loader pattern (event + promise) is the reference implementation; new loaders that omit it silently break on cold load.
-- **Status:** active
+- **Status:** promoted to rule (behavior-lazy-loader-ready-event.md)
 
 ## codemirror-viewport-dom-walk
 - **First seen:** PR #34 — `find-bar.ts:105` (round 1)
@@ -65,7 +65,7 @@ When a pattern hits 3+ recurrences, Crucible proposes a rule update in `rule-upd
   - PR #43 — `github-alert-plugin.ts:159-167` (round 1) — inline vs. blank-line alert format distinction lost through ProseMirror; `toMarkdown.runner` always emits blank-line format because format info isn't in attrs
 - **Count:** 2
 - **Pattern:** When a custom remark plugin stores metadata on MDAST nodes (beyond what's mapped to ProseMirror attrs in the `$nodeSchema`), that metadata is lost during the ProseMirror round-trip. The `parseMarkdown` runner only passes declared attrs to `openNode`, and `toMarkdown` only reads from `node.attrs`. Any MDAST property not mirrored in the schema attrs silently disappears after content passes through the editor, causing format-altering round-trips. Watch for custom MDAST properties that influence serialization but aren't in the ProseMirror attrs declaration.
-- **Status:** active
+- **Status:** promoted to rule (behavior-mdast-metadata-through-prosemirror.md)
 
 ## stale-async-callback-no-cancellation
 - **First seen:** PR #44 — `image-view.ts:67-70` (round 1)
@@ -103,7 +103,7 @@ When a pattern hits 3+ recurrences, Crucible proposes a rule update in `rule-upd
 - **Pattern:** Integration tests sometimes need a narrow host-to-webview command surface, but test-only webview messages are still part of the production bundle unless both the extension host command registration and the webview message handlers are explicitly gated. If those handlers run unconditionally, a production extension can accept synthetic test commands that mutate editor content or report internal state.
 - **Risk:** Production users, other extensions, or compromised webview code could invoke test-only mutation paths, bypassing normal UI constraints and exposing internal editor state.
 - **Mitigation:** Gate test command registration and webview test message handlers behind the same explicit test environment flag, and make test reporters no-op when the flag is absent.
-- **Status:** active
+- **Status:** promoted to rule (behavior-custom-editor-provider.md, test-only surface paragraph)
 
 ## convention-gate-script-mirrors-ci
 - **First seen:** PR #142 — `package.json:186` (round 1)
@@ -138,21 +138,21 @@ When a pattern hits 3+ recurrences, Crucible proposes a rule update in `rule-upd
 - **Recurrences:** (none yet)
 - **Count:** 1
 - **Pattern:** A `path.relative` containment check is lexical. A symlink committed to a cloned repo points outside the root and still passes. For local files, realpath both root and target before comparing, resolve a nonexistent target through its nearest existing ancestor, and refuse on any other error.
-- **Status:** active
+- **Status:** promoted to rule (behavior-webview-security.md, containment bullet)
 
 ## behavior-scheme-regex-drive-letters
 - **First seen:** PR #143 — `src/link-policy.ts:8-10` (round 1)
 - **Recurrences:** (none yet)
 - **Count:** 1
 - **Pattern:** A generic URI-scheme regex (`^[a-z][a-z0-9+.-]*:`) reads a Windows path `C:/x` as scheme `c`. That slipped past a refuse list into the "confirm" path, where ShellExecute would launch it. Treat one-letter schemes as local paths and refuse them.
-- **Status:** active
+- **Status:** promoted to rule (behavior-webview-security.md, link-scheme bullet)
 
 ## behavior-unbounded-modal-from-untrusted-messages
 - **First seen:** PR #143 — `src/editor-provider.ts:894-900` (round 1)
 - **Recurrences:** (none yet)
 - **Count:** 1
 - **Pattern:** Each untrusted webview message could open its own modal prompt, so a message loop could lock the window and train the user to click through. When an untrusted source can trigger a prompt, allow one in flight per source, set the guard before showing it, and drop requests while it is open.
-- **Status:** active
+- **Status:** promoted to rule (behavior-webview-security.md, LinkOpener bullet)
 
 ## behavior-catch-fire-and-forget
 - **First seen:** PR #143 — `src/editor-provider.ts:894-900` (round 1, confirm prompt `.then`)
@@ -160,7 +160,7 @@ When a pattern hits 3+ recurrences, Crucible proposes a rule update in `rule-upd
   - PR #143 — `src/editor-provider.ts:267-283` (round 2) — the new containment `.then` chains had no rejection handler
 - **Count:** 2
 - **Pattern:** New fire-and-forget promise chains were added without a rejection handler, twice in the same PR, even though the rule is already in `.claude/rules/behavior-catch-fire-and-forget.md`. After writing any `.then(` on a promise nobody awaits, add the `.catch` in the same edit.
-- **Status:** active
+- **Status:** covered by rule (behavior-catch-fire-and-forget.md, Forge library)
 
 ## convention-loader-drift-from-adr
 - **First seen:** PR #144 — `webview/editor/shiki-loader.ts` (implementation)

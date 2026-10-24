@@ -4,5 +4,8 @@
   "feedback": {
     "enabled": true
   },
-  "forge_path": "/Users/jeffreese/Code/forge"
+  "tracker": {
+    "type": "purecontext-tasks",
+    "project_id": "98f27715-649c-48e8-a70c-10de216d21fc"
+  }
 }

@@ -10,3 +10,7 @@ dist/
 .forge/crucible/review-checkpoints/
 .forge/crucible/review-state/
 .forge/recall.db*
+
+# forge: per-operator state and local files
+.forge/flow-log.jsonl
+.claude/settings.local.json

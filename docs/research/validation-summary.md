@@ -1,6 +1,6 @@
 ---
 title: "Validation Summary"
-phase: 2
+stage: validation
 project: "markdown-preview"
 date: 2026-05-09
 status: draft

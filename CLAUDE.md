@@ -36,7 +36,7 @@ Two runtime contexts connected by `postMessage`:
 - **Extension Host (Node.js):** `CustomTextEditorProvider` manages webview lifecycle and `TextDocument` sync. Configuration manager handles themes and settings.
 - **Webview (Browser):** Milkdown editor for WYSIWYG editing. Shiki and Mermaid as separate IIFE bundles for code/diagram rendering. Theme engine applies CSS custom properties.
 
-See `docs/spec/` for full planning documents and `docs/adrs/` for architectural decisions.
+See `docs/README.md` for the docs index (`docs/product/`, `docs/architecture/`, `docs/roadmap.md`) and `docs/decisions/` for architectural decisions.
 
 ## Conventions
 
@@ -51,4 +51,4 @@ Unit tests with Vitest. Integration tests launch a VS Code Extension Host and ex
 
 ## Development Roadmap
 
-See `docs/plans/backlog.md` for the plan queue. The forge plugin provides development workflow skills (`/forge:next`, `/forge:ship`, `/forge:wrap`, etc.).
+See `docs/roadmap.md` for the plan queue. The forge plugin provides development workflow skills (`/forge:next`, `/forge:ship`, `/forge:wrap`, etc.).

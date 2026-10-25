@@ -1,3 +1,16 @@
+---
+title: "Forward Notes"
+project: human-markdown
+date: 2026-10-25
+status: draft
+---
+
+# Forward Notes
+
+Detail captured in one stage for a later one. Migrated from the phase `NOTES.md` files on 2026-10-25.
+
+## From the architecture stage (was `docs/spec/phase-5/NOTES.md`)
+
 ## Technical Architecture (from seed spec)
 **Source:** Seed spec (cairn/projects/markdown-preview/spec.md)
 **Date:** 2026-05-08

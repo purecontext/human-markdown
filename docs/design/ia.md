@@ -1,6 +1,6 @@
 ---
 title: "Information Architecture"
-phase: 4
+stage: design
 project: "markdown-preview"
 date: 2026-05-09
 status: draft

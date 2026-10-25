@@ -1,6 +1,6 @@
 ---
 title: "Problem Statement"
-phase: 1
+stage: ideation
 project: "markdown-preview"
 date: 2026-05-08
 status: draft

@@ -1,6 +1,6 @@
 ---
 title: "Product Requirements Document"
-phase: 3
+stage: product
 project: "markdown-preview"
 date: 2026-05-08
 status: draft

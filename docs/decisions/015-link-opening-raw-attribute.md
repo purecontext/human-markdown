@@ -6,7 +6,7 @@ Accepted
 
 ## Context
 
-Links in the WYSIWYG editor need to be openable. The webview's base URL is `vscode-webview://some-id/...`, and the DOM property `anchor.href` resolves relative hrefs against that base. A markdown link like `[doc](./file.md)` becomes `vscode-webview://some-id/file.md`, which macOS has no handler for.
+Links in the WYSIWYG editor need to be openable. The webview's base URL is `vscode-webview://some-id/...`, and the DOM property `anchor.href` resolves relative hrefs against that base. A markdown link like `[doc](../adrs/file.md)` becomes `vscode-webview://some-id/file.md`, which macOS has no handler for.
 
 ## Decision
 

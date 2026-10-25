@@ -1,6 +1,6 @@
 ---
 title: "Technology Manifest"
-phase: 5
+stage: architecture
 project: "markdown-preview"
 date: 2026-05-09
 status: draft

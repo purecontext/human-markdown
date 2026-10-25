@@ -1,7 +1,7 @@
 {
   "version": 1,
   "plugin_versions": {
-    "forge": "3.12.0"
+    "forge": "3.13.0"
   },
   "gates": [
     {

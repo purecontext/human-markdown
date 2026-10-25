@@ -38,14 +38,16 @@
       ],
       "transitions": [
         { "event": "review-approved", "target": "approved", "action": null },
-        { "event": "changes-requested", "target": "iterating", "action": "/forge:iterate" }
+        { "event": "changes-requested", "target": "iterating", "action": "/forge:iterate" },
+        { "event": "merged", "target": "idle", "action": "/forge:merged" }
       ]
     },
     "iterating": {
       "description": "Addressing QA feedback. Reading PR comments, fixing, pushing.",
       "transitions": [
         { "event": "fixes-pushed", "target": "in-review", "action": null },
-        { "event": "iteration-abandoned", "target": "approved", "action": null }
+        { "event": "iteration-abandoned", "target": "approved", "action": null },
+        { "event": "merged", "target": "idle", "action": "/forge:merged" }
       ]
     },
     "approved": {
@@ -58,7 +60,8 @@
       "description": "QA loop exceeded max rounds. User intervention required.",
       "transitions": [
         { "event": "user-resolved", "target": "approved", "action": null },
-        { "event": "back-to-iterating", "target": "iterating", "action": "/forge:iterate" }
+        { "event": "back-to-iterating", "target": "iterating", "action": "/forge:iterate" },
+        { "event": "merged", "target": "idle", "action": "/forge:merged" }
       ]
     }
   },

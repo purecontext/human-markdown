@@ -1,0 +1,21 @@
+{
+  "name": "foundry",
+  "description": "foundry's planning mode. Extends the handoff state idle, which the base workflow.json owns; planning is foundry's.",
+  "states": {
+    "idle": {
+      "transitions": [
+        { "event": "plan-started", "target": "planning", "action": "/foundry:plan" }
+      ]
+    },
+    "planning": {
+      "description": "Planning in progress on a planning branch: intent docs under docs/ are being written. Build skills are invalid here, and writes outside docs/ are blocked.",
+      "transitions": [
+        { "event": "plan-done", "target": "idle", "action": "/foundry:done" },
+        { "event": "plan-abandoned", "target": "idle", "action": null }
+      ]
+    }
+  },
+  "resumption_targets": {
+    "planning": "planning"
+  }
+}

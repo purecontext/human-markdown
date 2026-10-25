@@ -2,6 +2,7 @@
   "enabledPlugins": {
     "forge@forge-marketplace": true,
     "forge-flow@forge-marketplace": true,
-    "crucible@forge-marketplace": true
+    "crucible@forge-marketplace": true,
+    "foundry@forge-marketplace": true
   }
 }

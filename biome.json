@@ -21,6 +21,14 @@
     }
   },
   "files": {
-    "includes": ["**", "!dist", "!node_modules", "!.vscode-test", "!mock.html", "!*.vsix"]
+    "includes": [
+      "**",
+      "!dist",
+      "!node_modules",
+      "!.vscode-test",
+      "!mock.html",
+      "!*.vsix",
+      "!**/.forge"
+    ]
   }
 }

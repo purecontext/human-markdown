@@ -65,6 +65,22 @@
       "source": "forge"
     },
     {
+      "id": "mock-layout-alignment",
+      "instruction": "If the project has design mocks or wireframes (in docs/design/, docs/wireframes/, or referenced in specs): verify the implemented component structure matches the visual hierarchy in the mocks. Flag structural divergences (missing sections, reordered elements, extra wrapper levels not in the design).",
+      "triggers": [
+        "next"
+      ],
+      "severity": "warn",
+      "detection": {
+        "files": [
+          "docs/design/**",
+          "docs/wireframes/**",
+          "docs/ui-spec.*"
+        ]
+      },
+      "source": "forge"
+    },
+    {
       "id": "local-server-guard",
       "instruction": "When the diff adds or changes a network listener, route, static handler, or WebSocket/upgrade handler: the server binds 127.0.0.1 unless LAN access is a recorded decision, one request guard (Host allowlist, Origin allowlist when present, Sec-Fetch-Site refusing cross-site and same-site) runs before every route, static file, and upgrade, and a test sends a rebinding Host and gets refused. CORS config is not a guard. See behavior-localhost-browser-request-guard.",
       "triggers": [

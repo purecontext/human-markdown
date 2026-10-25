@@ -1,7 +1,8 @@
 {
   "version": 1,
   "plugin_versions": {
-    "forge": "3.10.1"
+    "forge": "3.13.0",
+    "forge-flow": "1.1.0"
   },
   "rules": {
     ".claude/rules/action-auto-startup.md": {
@@ -13,6 +14,11 @@
       "source": "forge:js-ts/behavior-catch-fire-and-forget.md",
       "library_hash": "b8c9c725ffcb049c",
       "local_hash": "b8c9c725ffcb049c"
+    },
+    ".claude/rules/behavior-claims-name-their-evidence.md": {
+      "source": "forge:core/behavior-claims-name-their-evidence.md",
+      "library_hash": "ced5fc3d489dbaca",
+      "local_hash": "ced5fc3d489dbaca"
     },
     ".claude/rules/behavior-consumer-update-on-shape-change.md": {
       "source": "forge:core/behavior-consumer-update-on-shape-change.md",
@@ -28,6 +34,11 @@
       "source": "forge:core/behavior-extract-on-second-copy.md",
       "library_hash": "11bbd94c117df620",
       "local_hash": "11bbd94c117df620"
+    },
+    ".claude/rules/behavior-fail-closed-guards.md": {
+      "source": "forge:core/behavior-fail-closed-guards.md",
+      "library_hash": "5e56e02981d0fd7a",
+      "local_hash": "5e56e02981d0fd7a"
     },
     ".claude/rules/behavior-library-defaults-on-untrusted-input.md": {
       "source": "forge:core/behavior-library-defaults-on-untrusted-input.md",
@@ -54,6 +65,11 @@
       "library_hash": "848da71d06e1751a",
       "local_hash": "848da71d06e1751a"
     },
+    ".claude/rules/behavior-static-boundary-checks.md": {
+      "source": "forge:js-ts/behavior-static-boundary-checks.md",
+      "library_hash": "5f2d8dd05a07f93a",
+      "local_hash": "5f2d8dd05a07f93a"
+    },
     ".claude/rules/behavior-teardown-completes-cleanup.md": {
       "source": "forge:core/behavior-teardown-completes-cleanup.md",
       "library_hash": "8d316754aa3ecd0e",
@@ -61,8 +77,8 @@
     },
     ".claude/rules/behavior-test-adequacy.md": {
       "source": "forge:core/behavior-test-adequacy.md",
-      "library_hash": "0210f76e2d1c462d",
-      "local_hash": "0210f76e2d1c462d"
+      "library_hash": "af63f8305fc1ce1d",
+      "local_hash": "af63f8305fc1ce1d"
     },
     ".claude/rules/behavior-test-isolation.md": {
       "source": "forge:core/behavior-test-isolation.md",
@@ -76,13 +92,18 @@
     },
     ".claude/rules/behavior-utc-date-construction.md": {
       "source": "forge:js-ts/behavior-utc-date-construction.md",
-      "library_hash": "d87c36ab8092a66a",
-      "local_hash": "d87c36ab8092a66a"
+      "library_hash": "330661e85380f249",
+      "local_hash": "330661e85380f249"
     },
     ".claude/rules/convention-docs-match-code.md": {
       "source": "forge:core/convention-docs-match-code.md",
       "library_hash": "550957e00af891d4",
       "local_hash": "550957e00af891d4"
+    },
+    ".claude/rules/convention-intent-before-code.md": {
+      "source": "forge:core/convention-intent-before-code.md",
+      "library_hash": "5fa1d548049d7fa5",
+      "local_hash": "5fa1d548049d7fa5"
     }
   },
   "opted_out": []

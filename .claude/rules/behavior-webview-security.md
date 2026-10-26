@@ -1,3 +1,10 @@
+---
+paths:
+  - "src/**"
+  - "webview/**"
+  - "test/**"
+---
+
 # Webview Security
 
 Every webview must set a strict Content Security Policy:

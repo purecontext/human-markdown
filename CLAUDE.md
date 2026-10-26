@@ -40,14 +40,15 @@ See `docs/README.md` for the docs index (`docs/product/`, `docs/architecture/`, 
 
 ## Conventions
 
-- Extension host source: `src/`, webview source: `webview/`
+- Extension host source: `src/`, webview source: `webview/`. Never import across that boundary or assume the other context's APIs; everything crosses by `postMessage`. esbuild builds CJS for the host and ESM for the webview, never mixed in one bundle
+- Theme tokens are CSS custom properties defined once (`webview/shared/theme`); no inline styles in the webview (ADR-008). There is no shared markdown-it pipeline: Milkdown renders through its own Remark pipeline and nodeViews (ADR-003 retired)
 - Files: kebab-case. Classes: PascalCase. Functions/variables: camelCase.
 - Tests co-located (`*.test.ts` next to source)
 - Biome: single quotes, 2-space indent, 100 line width, semicolons as needed
 
 ## Testing
 
-Unit tests with Vitest. Integration tests launch a VS Code Extension Host and exercise custom-editor webview flows. Focus on round-trip fidelity (markdown → edit → markdown), theme token injection, bundle size budgets, and editor state restoration.
+Unit tests with Vitest (`pnpm test`). Integration tests (`pnpm test:integration`) launch a real VS Code Extension Host and exercise custom-editor webview flows; the run needs an unsandboxed launch and a short `/tmp` root, so read `docs/architecture/testing.md` before debugging a launch failure. Focus on round-trip fidelity (markdown → edit → markdown), theme token injection, bundle size budgets, and editor state restoration.
 
 ## Development Roadmap
 

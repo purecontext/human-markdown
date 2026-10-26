@@ -1,3 +1,9 @@
+---
+paths:
+  - "webview/**"
+  - "test/**"
+---
+
 # Round-Trip Fidelity
 
 The editor must never introduce formatting changes the user didn't make. When markdown is loaded, edited, and serialized back, the output must preserve:

@@ -1,5 +1,7 @@
 # Auto-Startup
 
+Main session only. Skip when running as a spawned agent or subagent (the first message is a task delegation, not the user).
+
 On the first user message of a session, run `/forge:startup` before
 responding — unless the message is itself `/forge:startup` or a
 non-work command (`/clear`, `/help`, `/config`).

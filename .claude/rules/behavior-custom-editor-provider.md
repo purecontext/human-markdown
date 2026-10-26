@@ -1,3 +1,9 @@
+---
+paths:
+  - "src/**"
+  - "webview/**"
+---
+
 # CustomTextEditorProvider Ownership (ADR-002)
 
 All webview content goes through `CustomTextEditorProvider`. Do not create standalone `WebviewPanel` instances for preview or editing.

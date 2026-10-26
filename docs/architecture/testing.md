@@ -1,4 +1,8 @@
-# Integration Test Runner
+# Testing
+
+Unit tests run with Vitest, co-located with the source. The rest of this page is the integration suite.
+
+## Integration Test Runner
 
 Run the real VS Code Extension Host integration suite with:
 

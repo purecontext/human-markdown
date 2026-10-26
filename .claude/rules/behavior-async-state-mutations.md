@@ -1,3 +1,9 @@
+---
+paths:
+  - "src/**"
+  - "webview/**"
+---
+
 # Async State Mutations
 
 Two patterns, opposite timing:

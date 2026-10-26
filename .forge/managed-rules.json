@@ -7,20 +7,20 @@
   "rules": {
     ".claude/rules/action-auto-startup.md": {
       "source": "forge:core/action-auto-startup.md",
-      "library_hash": "abcf9f0ff5290827",
-      "local_hash": "abcf9f0ff5290827"
+      "library_hash": "6e04ea57aa8d92ec",
+      "local_hash": "6e04ea57aa8d92ec"
     },
     ".claude/rules/behavior-async-error-feedback.md": {
       "source": "project",
-      "local_hash": "5826c58ef404a506"
+      "local_hash": "f8a6cbe943b81985"
     },
     ".claude/rules/behavior-async-state-mutations.md": {
       "source": "project",
-      "local_hash": "eb2e714f8de44b77"
+      "local_hash": "9f43c4a2fd786c28"
     },
     ".claude/rules/behavior-bundle-performance.md": {
       "source": "project",
-      "local_hash": "5e1cef66d36eba04"
+      "local_hash": "45d0a075379e7ef8"
     },
     ".claude/rules/behavior-catch-fire-and-forget.md": {
       "source": "forge:js-ts/behavior-catch-fire-and-forget.md",
@@ -44,7 +44,7 @@
     },
     ".claude/rules/behavior-custom-editor-provider.md": {
       "source": "project",
-      "local_hash": "75990f3cbedec341"
+      "local_hash": "3efc50dc38aae4af"
     },
     ".claude/rules/behavior-extract-on-second-copy.md": {
       "source": "forge:core/behavior-extract-on-second-copy.md",
@@ -71,7 +71,7 @@
     },
     ".claude/rules/behavior-milkdown-api-boundary.md": {
       "source": "project",
-      "local_hash": "31e9dcb7a87a0377"
+      "local_hash": "304ddc9c3821191d"
     },
     ".claude/rules/behavior-no-speculative-config.md": {
       "source": "forge:core/behavior-no-speculative-config.md",
@@ -85,7 +85,7 @@
     },
     ".claude/rules/behavior-round-trip-fidelity.md": {
       "source": "project",
-      "local_hash": "c526707acb0c4345"
+      "local_hash": "fb967c30edc955db"
     },
     ".claude/rules/behavior-safe-number-conversion.md": {
       "source": "forge:js-ts/behavior-safe-number-conversion.md",
@@ -96,10 +96,6 @@
       "source": "forge:core/behavior-secrets-at-rest.md",
       "library_hash": "848da71d06e1751a",
       "local_hash": "848da71d06e1751a"
-    },
-    ".claude/rules/behavior-shared-rendering-pipeline.md": {
-      "source": "project",
-      "local_hash": "f6904df78ac2b3f7"
     },
     ".claude/rules/behavior-static-boundary-checks.md": {
       "source": "forge:js-ts/behavior-static-boundary-checks.md",
@@ -128,29 +124,17 @@
     },
     ".claude/rules/behavior-webview-security.md": {
       "source": "project",
-      "local_hash": "0f6e60c56374eb6b"
+      "local_hash": "1606a76be7c1df99"
     },
     ".claude/rules/convention-docs-match-code.md": {
       "source": "forge:core/convention-docs-match-code.md",
       "library_hash": "550957e00af891d4",
       "local_hash": "550957e00af891d4"
     },
-    ".claude/rules/convention-extension-architecture.md": {
-      "source": "project",
-      "local_hash": "1841e355f59a9e53"
-    },
-    ".claude/rules/convention-integration-test-runner.md": {
-      "source": "project",
-      "local_hash": "e8643043dc25aa56"
-    },
     ".claude/rules/convention-intent-before-code.md": {
       "source": "forge:core/convention-intent-before-code.md",
       "library_hash": "a998143c67e038e7",
       "local_hash": "a998143c67e038e7"
-    },
-    ".claude/rules/resume.md": {
-      "source": "project",
-      "local_hash": "2074a0b7a80982a1"
     }
   },
   "opted_out": []

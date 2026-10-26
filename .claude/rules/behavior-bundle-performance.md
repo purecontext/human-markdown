@@ -1,3 +1,10 @@
+---
+paths:
+  - "webview/**"
+  - "esbuild.config.mjs"
+  - "package.json"
+---
+
 # Bundle Size and Performance
 
 Use selective Milkdown imports — do not use the Crepe batteries-included bundle (415KB gzipped). Import only the specific plugins needed.

@@ -1,13 +1,11 @@
 # Test Adequacy
 
-A test earns its place only if it fails when the behavior it names breaks. Before calling code tested, prove it:
+A test earns its place only by failing when the behavior it names breaks:
 
-- **Revert and run, where you doubt.** While editing, when a load-bearing line (a guard, filter, write, wake, validation, cleanup) is one you are not sure a test observes, revert it and confirm the test named for it fails when run alone. For `if (cond) act()` the two doubts are the call and the guard; a guard that refuses the unexpected also has a fail-open twin (`behavior-fail-closed-guards`). This is a judgment applied as you go, not a pass over every line the diff adds, and it produces no count. Where a miss costs something, a declared safety boundary (`mutation.paths` in `.forge/config.json`) or a component documented as a guarantee, `/crucible:mutation-check` does the pass mechanically, scoped and under a time budget, and prints the ledger (killed, survived, skipped with reasons, unaccounted). Measured on tvforge and on the runner itself: an every-line pass spends three quarters of its mutants on argument checks, messages and output formatting, and finds its real gaps in the two regions where a miss costs something.
-- **Assert the claimed state.** Check the exact value or absence the test name promises, not a proxy that holds either way.
-- **No tautologies.** Don't test what the compiler or type system already enforces, and don't recompute the production formula in the assertion. Where no independent derivation exists (layout, geometry, positioning), measure the real output once and encode the measured numbers. Test errors, ranges, boundaries, round-trips, and invariants.
-- **Branches and boundaries.** A pure helper with branches gets a case per branch and per boundary; export it to test it.
-- **Test the glue.** A function that composes tested parts still needs tests for the wiring it adds itself. If deleting that wiring breaks no test, coverage is missing.
+- **Revert and run, where you doubt.** Revert a load-bearing line you doubt a test observes; its named test must fail alone. Guards have fail-open twins too (`behavior-fail-closed-guards`). A judgment, no count; `/crucible:mutation-check` does the pass on a declared boundary or documented guarantee.
+- **Assert the claimed state, no tautologies.** Check the exact value or absence the name promises: no proxy, no recomputed production formula, nothing the type system already enforces. No independent derivation: measure once, encode the numbers.
+- **Branches and glue.** A pure helper gets a case per branch and boundary, exported to test it. Wiring over tested parts needs its own test; deleting it must break one.
 
-A line no test can observe changes no output: it is dead code. Remove it instead of testing it.
+A line no test can observe is dead code.
 
-*Source: learned regressions (purecontext-platform, evolution-sim, finpulse, healthpulse — tests that passed with the guarded line deleted; tvforge — a "12/12" count that silently skipped a load-bearing line). The every-line pass and its counts were retired 2026-10-26: mutation checks are on demand.*
+*Source: purecontext-platform, evolution-sim, finpulse, healthpulse, tvforge — tests passed with the guarded line deleted.*

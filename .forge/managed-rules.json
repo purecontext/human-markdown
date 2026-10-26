@@ -1,7 +1,7 @@
 {
   "version": 1,
   "plugin_versions": {
-    "forge": "3.13.0",
+    "forge": "3.14.0",
     "forge-flow": "1.1.0"
   },
   "rules": {
@@ -17,8 +17,8 @@
     },
     ".claude/rules/behavior-claims-name-their-evidence.md": {
       "source": "forge:core/behavior-claims-name-their-evidence.md",
-      "library_hash": "1439e7d8eb6226e8",
-      "local_hash": "1439e7d8eb6226e8"
+      "library_hash": "dbab707e35685c81",
+      "local_hash": "dbab707e35685c81"
     },
     ".claude/rules/behavior-consumer-update-on-shape-change.md": {
       "source": "forge:core/behavior-consumer-update-on-shape-change.md",
@@ -37,8 +37,8 @@
     },
     ".claude/rules/behavior-fail-closed-guards.md": {
       "source": "forge:core/behavior-fail-closed-guards.md",
-      "library_hash": "a66a04afe6034c5f",
-      "local_hash": "a66a04afe6034c5f"
+      "library_hash": "edbf20bc625a0c5c",
+      "local_hash": "edbf20bc625a0c5c"
     },
     ".claude/rules/behavior-library-defaults-on-untrusted-input.md": {
       "source": "forge:core/behavior-library-defaults-on-untrusted-input.md",
@@ -77,18 +77,13 @@
     },
     ".claude/rules/behavior-test-adequacy.md": {
       "source": "forge:core/behavior-test-adequacy.md",
-      "library_hash": "2b4cfdfa090b0ccf",
-      "local_hash": "2b4cfdfa090b0ccf"
+      "library_hash": "23a5ba76e44535d6",
+      "local_hash": "23a5ba76e44535d6"
     },
     ".claude/rules/behavior-test-isolation.md": {
       "source": "forge:core/behavior-test-isolation.md",
       "library_hash": "761ea18f3d1d1f1d",
       "local_hash": "761ea18f3d1d1f1d"
-    },
-    ".claude/rules/behavior-untrusted-content-to-agents.md": {
-      "source": "forge:core/behavior-untrusted-content-to-agents.md",
-      "library_hash": "7a51caa7b6eed2c8",
-      "local_hash": "7a51caa7b6eed2c8"
     },
     ".claude/rules/behavior-utc-date-construction.md": {
       "source": "forge:js-ts/behavior-utc-date-construction.md",
@@ -102,8 +97,8 @@
     },
     ".claude/rules/convention-intent-before-code.md": {
       "source": "forge:core/convention-intent-before-code.md",
-      "library_hash": "5fa1d548049d7fa5",
-      "local_hash": "5fa1d548049d7fa5"
+      "library_hash": "a998143c67e038e7",
+      "local_hash": "a998143c67e038e7"
     }
   },
   "opted_out": []

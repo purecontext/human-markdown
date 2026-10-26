@@ -1,10 +1,9 @@
 # Intent Changes Come Before Code
 
-The intent docs say what the product is meant to be: `docs/product/`, `docs/design/`, the entries of `docs/roadmap.md` (which ones, their scope, their order) and the existing files in `docs/decisions/`. They change only in a planning bout (`/foundry:plan`), on a planning branch. A build branch reads them and does not edit them.
+The intent docs (`docs/product/`, `docs/design/`, `docs/roadmap.md` entries, existing `docs/decisions/`) change only in a planning bout (`/foundry:plan`). A build branch reads them and does not edit them.
 
-- **A task that needs the intent to change stops before the branch.** If it alters a requirement or acceptance criterion, drops or changes a user flow, renames a concept the PRD defines, contradicts an accepted decision, or widens a roadmap entry past its one line: say which docs and lines, and that `/foundry:plan <feature>` edits them first. Do not implement the new intent and fix the docs after.
-- **Found mid-task, it becomes a divergence, not an edit.** When implementation shows the intent is wrong or unbuildable as written, finish what the intent covers and append an entry to `docs/product/divergence.md` (kind, the intent quote with its path, what the code does, the date). The planning bout resolves it: change the intent, schedule the work, or drop it with a note.
-- **As-built docs are yours.** `docs/architecture/`, `docs/guides/`, `docs/reference/`, `docs/plans/<slug>/`, `docs/README.md`, `CLAUDE.md` and a new ADR in `docs/decisions/` change with the code, in the same PR.
-- **Roadmap edits a build branch may make:** checking an entry off, adding a sub-plan line under it. Nothing else.
+- **A task that needs the intent to change stops before the branch.** A changed requirement, user flow, PRD concept, accepted decision or roadmap scope: name the docs and lines; `/foundry:plan <feature>` edits them first. Never build the new intent and fix the docs after.
+- **Found mid-task, it is a divergence, not an edit.** Finish what the intent covers and append to `docs/product/divergence.md`; the planning bout resolves it.
+- **As-built docs are yours.** Everything else under `docs/`, `CLAUDE.md` and new ADRs change with the code. A build branch may check a roadmap entry off or add a sub-plan line, nothing else.
 
-*Source: Forge split design, 2026-10-23 (foundry owns intent, forge owns as-built; the build agent edited PRD scope in code PRs and the plan and the product silently diverged).*
+*Source: Forge split design, 2026-10-23 (PRD scope edited in code PRs; plan and product diverged).*

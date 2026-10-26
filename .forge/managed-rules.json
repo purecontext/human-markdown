@@ -17,8 +17,8 @@
     },
     ".claude/rules/behavior-claims-name-their-evidence.md": {
       "source": "forge:core/behavior-claims-name-their-evidence.md",
-      "library_hash": "ced5fc3d489dbaca",
-      "local_hash": "ced5fc3d489dbaca"
+      "library_hash": "1439e7d8eb6226e8",
+      "local_hash": "1439e7d8eb6226e8"
     },
     ".claude/rules/behavior-consumer-update-on-shape-change.md": {
       "source": "forge:core/behavior-consumer-update-on-shape-change.md",
@@ -37,8 +37,8 @@
     },
     ".claude/rules/behavior-fail-closed-guards.md": {
       "source": "forge:core/behavior-fail-closed-guards.md",
-      "library_hash": "5e56e02981d0fd7a",
-      "local_hash": "5e56e02981d0fd7a"
+      "library_hash": "a66a04afe6034c5f",
+      "local_hash": "a66a04afe6034c5f"
     },
     ".claude/rules/behavior-library-defaults-on-untrusted-input.md": {
       "source": "forge:core/behavior-library-defaults-on-untrusted-input.md",
@@ -77,8 +77,8 @@
     },
     ".claude/rules/behavior-test-adequacy.md": {
       "source": "forge:core/behavior-test-adequacy.md",
-      "library_hash": "af63f8305fc1ce1d",
-      "local_hash": "af63f8305fc1ce1d"
+      "library_hash": "2b4cfdfa090b0ccf",
+      "local_hash": "2b4cfdfa090b0ccf"
     },
     ".claude/rules/behavior-test-isolation.md": {
       "source": "forge:core/behavior-test-isolation.md",

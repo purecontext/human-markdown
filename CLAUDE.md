@@ -52,4 +52,4 @@ Unit tests with Vitest (`pnpm test`). Integration tests (`pnpm test:integration`
 
 ## Development Roadmap
 
-See `docs/roadmap.md` for the plan queue. The forge plugin provides development workflow skills (`/forge:next`, `/forge:ship`, `/forge:wrap`, etc.).
+See `docs/roadmap.md` for the plan queue. The forge plugin provides development workflow skills (`/forge:work`, `/forge:ship`, `/forge:wrap`, etc.).

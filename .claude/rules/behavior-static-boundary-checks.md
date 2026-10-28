@@ -2,6 +2,8 @@
 paths:
   - "test/**"
   - "tests/**"
+  - "**/*.test.*"
+  - "**/*.spec.*"
 ---
 # Static Boundary Checks
 

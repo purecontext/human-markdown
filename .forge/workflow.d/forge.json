@@ -4,7 +4,7 @@
   "states": {
     "idle": {
       "transitions": [
-        { "event": "task-picked", "target": "implementing", "action": "/forge:next" }
+        { "event": "task-picked", "target": "implementing", "action": "/forge:work" }
       ]
     },
     "implementing": {
@@ -39,6 +39,7 @@
       "transitions": [
         { "event": "review-approved", "target": "approved", "action": null },
         { "event": "changes-requested", "target": "iterating", "action": "/forge:iterate" },
+        { "event": "escalate", "target": "escalated", "action": null },
         { "event": "merged", "target": "idle", "action": "/forge:merged" }
       ]
     },
@@ -57,7 +58,7 @@
       ]
     },
     "escalated": {
-      "description": "QA loop exceeded max rounds. User intervention required.",
+      "description": "QA loop exceeded max rounds, or crucible posted a step-back report. User intervention required.",
       "transitions": [
         { "event": "user-resolved", "target": "approved", "action": null },
         { "event": "back-to-iterating", "target": "iterating", "action": "/forge:iterate" },

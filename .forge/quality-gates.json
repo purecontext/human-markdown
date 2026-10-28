@@ -167,5 +167,8 @@
       "severity": "block",
       "detection": "always"
     }
-  ]
+  ],
+  "pr_size": {
+    "changed_lines": 400
+  }
 }

@@ -99,8 +99,8 @@
     },
     ".claude/rules/behavior-static-boundary-checks.md": {
       "source": "forge:js-ts/behavior-static-boundary-checks.md",
-      "library_hash": "5f2d8dd05a07f93a",
-      "local_hash": "5f2d8dd05a07f93a"
+      "library_hash": "65be8fe6bb425131",
+      "local_hash": "65be8fe6bb425131"
     },
     ".claude/rules/behavior-teardown-completes-cleanup.md": {
       "source": "forge:core/behavior-teardown-completes-cleanup.md",
@@ -125,6 +125,11 @@
     ".claude/rules/behavior-webview-security.md": {
       "source": "project",
       "local_hash": "1606a76be7c1df99"
+    },
+    ".claude/rules/convention-deferred-work-has-an-owner.md": {
+      "source": "forge:core/convention-deferred-work-has-an-owner.md",
+      "library_hash": "35590bc920dd17b7",
+      "local_hash": "35590bc920dd17b7"
     },
     ".claude/rules/convention-docs-match-code.md": {
       "source": "forge:core/convention-docs-match-code.md",

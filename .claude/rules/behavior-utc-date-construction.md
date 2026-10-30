@@ -20,5 +20,3 @@ start.toLocaleDateString('en-US', { timeZone: 'UTC', month: 'short', year: 'nume
 ```
 
 Doesn't apply to instants (timestamps of events, "now"); those are already timezone-free epoch values. It applies when the value means a calendar day.
-
-*Source: learned regression (finpulse — timezone-dependent dates, 3 occurrences).*

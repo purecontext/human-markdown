@@ -1,6 +1,6 @@
 # Library Defaults on Untrusted Input
 
-A parser or converter pointed at input from outside the user's control (email HTML, headers, URLs, uploaded or scanned files, fetched pages) runs on its defaults unless every limit and transform is set on purpose. Defaults are tuned for friendly input.
+A parser or converter pointed at input from outside the user's control (email HTML, headers, URLs, uploaded or scanned files, fetched pages) runs on its defaults unless every limit and transform is set on purpose. Defaults are tuned for friendly input; hostile input finds the bound nobody set, and the failure is a hang or a crash in production.
 
 Before wiring the library in:
 
@@ -12,5 +12,3 @@ Before wiring the library in:
 The bound is per call. A caller that loops over attacker-controlled items needs its own budget.
 
 Doesn't apply to input the project itself produced (its own config, generated files).
-
-*Source: learned regression (mailpulse — html-to-text and htmlparser2 ran on defaults against hostile email HTML: no depth limit, uppercased headings, 16 MB input, quadratic parse).*

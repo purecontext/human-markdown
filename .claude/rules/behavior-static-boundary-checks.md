@@ -14,5 +14,3 @@ A test that refuses code by reading its source (a layer-import check, a forbidde
 - **Enumerate the language's other spellings** of what you refuse before calling it covered: casts, `!`, parentheses and optional chains around the target; `global`/`globalThis` aliases; destructuring in declarations, assignments and default parameters; computed and template-literal keys; rest elements; tagged-template calls; the runtime's other loaders (`createRequire`, `process.getBuiltinModule`, `module.require`).
 - **Test rows use spellings that compile.** Run `tsc` on the refused form; a row the compiler rejects proves nothing about code that can land. Untyped APIs (`process.binding`) only ever appear behind a cast.
 - **Contortions are declared scope, not silent gaps.** Aliasing to a variable, `Reflect.get`, string-built names: list them as out of scope in the check's doc comment.
-
-*Source: learned regression (tvforge — a layer and forbidden-module checker missed `file:`, `#`, `.pnpm/`, `cluster`/`execve`/`inspector`, destructured and cast spellings, and a plain-object lookup answered for `constructor`; 4 occurrences across two PRs).*

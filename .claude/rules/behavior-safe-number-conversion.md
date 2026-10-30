@@ -21,5 +21,3 @@ export function safeNumber(value: string | null | undefined): number | undefined
 Use it on both sides: server-side request parsing and client-side URL-state parsing. Keep one helper per side, not an inline copy per route. Where the value must be an integer or in a range, validate after parsing (or use a schema validator that rejects instead of coercing).
 
 Doesn't apply to values the program produced itself (its own JSON, typed config): there `NaN` means a bug upstream, and it should fail loudly.
-
-*Source: learned regression (finpulse — NaN propagated to silent empty results, 3 occurrences).*

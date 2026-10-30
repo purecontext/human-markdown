@@ -22,5 +22,3 @@ emitter.on('message', (msg) => {
 ```
 
 Omit the `.catch()` only when the caller awaits the promise and handles rejection there. Fire-and-forget means nobody awaits, so the rejection has nowhere to go but `unhandledRejection`.
-
-*Source: learned regression (localhost — un-awaited promise chains with no rejection handler).*

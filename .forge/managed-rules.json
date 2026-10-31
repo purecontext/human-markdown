@@ -38,8 +38,8 @@
     },
     ".claude/rules/behavior-fail-closed-guards.md": {
       "source": "forge:core/behavior-fail-closed-guards.md",
-      "library_hash": "81a496fcd19622d4",
-      "local_hash": "81a496fcd19622d4"
+      "library_hash": "71ad3cf78d898b9e",
+      "local_hash": "71ad3cf78d898b9e"
     },
     ".claude/rules/behavior-lazy-loader-ready-event.md": {
       "source": "project",
@@ -89,8 +89,8 @@
     },
     ".claude/rules/behavior-test-adequacy.md": {
       "source": "forge:core/behavior-test-adequacy.md",
-      "library_hash": "dde53682f601b66c",
-      "local_hash": "dde53682f601b66c"
+      "library_hash": "e62199b4b4e35cd3",
+      "local_hash": "e62199b4b4e35cd3"
     },
     ".claude/rules/behavior-test-isolation.md": {
       "source": "forge:core/behavior-test-isolation.md",

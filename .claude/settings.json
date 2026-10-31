@@ -3,6 +3,7 @@
     "forge@forge-marketplace": true,
     "forge-flow@forge-marketplace": true,
     "crucible@forge-marketplace": true,
-    "foundry@forge-marketplace": true
+    "foundry@forge-marketplace": true,
+    "recall@purecontext": true
   }
 }

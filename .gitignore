@@ -17,3 +17,8 @@ dist/
 
 # forge: per-operator state and local files
 .forge/.*-litestream/
+
+# forge: per-operator state and local files
+.forge/backup-registration.json
+.forge/*.after-interrupted-pull*
+.claude/settings.local.json.after-interrupted-pull*

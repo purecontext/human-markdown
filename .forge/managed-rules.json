@@ -38,8 +38,8 @@
     },
     ".claude/rules/behavior-fail-closed-guards.md": {
       "source": "forge:core/behavior-fail-closed-guards.md",
-      "library_hash": "71ad3cf78d898b9e",
-      "local_hash": "71ad3cf78d898b9e"
+      "library_hash": "391dfbdf0fb372b7",
+      "local_hash": "391dfbdf0fb372b7"
     },
     ".claude/rules/behavior-lazy-loader-ready-event.md": {
       "source": "project",
@@ -89,13 +89,13 @@
     },
     ".claude/rules/behavior-test-adequacy.md": {
       "source": "forge:core/behavior-test-adequacy.md",
-      "library_hash": "e62199b4b4e35cd3",
-      "local_hash": "e62199b4b4e35cd3"
+      "library_hash": "a312b53210cc5cc3",
+      "local_hash": "a312b53210cc5cc3"
     },
     ".claude/rules/behavior-test-isolation.md": {
       "source": "forge:core/behavior-test-isolation.md",
-      "library_hash": "90e00ee46c76d4d6",
-      "local_hash": "90e00ee46c76d4d6"
+      "library_hash": "63a314facc278246",
+      "local_hash": "63a314facc278246"
     },
     ".claude/rules/behavior-utc-date-construction.md": {
       "source": "forge:js-ts/behavior-utc-date-construction.md",
@@ -108,8 +108,8 @@
     },
     ".claude/rules/convention-deferred-work-has-an-owner.md": {
       "source": "forge:core/convention-deferred-work-has-an-owner.md",
-      "library_hash": "c23c79f5527283ff",
-      "local_hash": "c23c79f5527283ff"
+      "library_hash": "4352235943567509",
+      "local_hash": "4352235943567509"
     },
     ".claude/rules/convention-docs-match-code.md": {
       "source": "forge:core/convention-docs-match-code.md",

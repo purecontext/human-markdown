@@ -22,3 +22,7 @@ dist/
 .forge/backup-registration.json
 .forge/*.after-interrupted-pull*
 .claude/settings.local.json.after-interrupted-pull*
+
+# forge: per-operator state and local files
+.forge/*.staged-before-pull*
+.claude/settings.local.json.staged-before-pull*

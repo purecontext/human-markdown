@@ -47,8 +47,8 @@
     },
     ".claude/rules/behavior-library-defaults-on-untrusted-input.md": {
       "source": "forge:core/behavior-library-defaults-on-untrusted-input.md",
-      "library_hash": "6a58b47e4199842e",
-      "local_hash": "6a58b47e4199842e"
+      "library_hash": "653a54e94e330e35",
+      "local_hash": "653a54e94e330e35"
     },
     ".claude/rules/behavior-mdast-metadata-through-prosemirror.md": {
       "source": "project",

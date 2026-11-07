@@ -9,6 +9,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Contributor and tooling Node versions, not the extension's runtime:
+        # the extension runs in VS Code's bundled Node.
+        node-version: [22, 26]
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
@@ -16,11 +22,14 @@ jobs:
           version: 10
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: ${{ matrix.node-version }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm build
       - run: pnpm test
+      # Exercises vsce on each Node version, so a tooling break surfaces here
+      # rather than on a release tag push.
+      - run: pnpm package
       - run: pnpm audit --audit-level=high --ignore-unfixable

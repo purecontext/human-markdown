@@ -89,8 +89,8 @@
     },
     ".claude/rules/behavior-test-adequacy.md": {
       "source": "forge:core/behavior-test-adequacy.md",
-      "library_hash": "a312b53210cc5cc3",
-      "local_hash": "a312b53210cc5cc3"
+      "library_hash": "4d4921e056c06205",
+      "local_hash": "4d4921e056c06205"
     },
     ".claude/rules/behavior-test-isolation.md": {
       "source": "forge:core/behavior-test-isolation.md",

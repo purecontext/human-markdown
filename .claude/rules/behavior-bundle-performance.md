@@ -7,7 +7,7 @@ paths:
 
 # Bundle Size and Performance
 
-Use selective Milkdown imports — do not use the Crepe batteries-included bundle (415KB gzipped). Import only the specific plugins needed.
+Use selective Milkdown imports, not the Crepe batteries-included bundle, because Crepe alone is 415KB gzipped of the 520KB budget below. Import only the specific plugins needed.
 
 Lazy-load heavy rendering plugins (Mermaid, KaTeX) — only load them when the document contains those block types. Do not include them in the initial bundle.
 

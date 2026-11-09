@@ -6,7 +6,7 @@ paths:
 
 # Round-Trip Fidelity
 
-The editor must never introduce formatting changes the user didn't make. When markdown is loaded, edited, and serialized back, the output must preserve:
+The editor must never introduce formatting changes the user didn't make, because every one becomes a diff in the user's repo they did not write. When markdown is loaded, edited, and serialized back, the output must preserve:
 - Indent style (spaces vs tabs, indent width)
 - Blank line patterns
 - Heading style (ATX `#` vs setext `===`)

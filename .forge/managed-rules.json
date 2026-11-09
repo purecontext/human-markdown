@@ -1,7 +1,7 @@
 {
   "version": 1,
   "plugin_versions": {
-    "forge": "3.15.0",
+    "forge": "3.16.0",
     "forge-flow": "1.1.1"
   },
   "rules": {
@@ -15,7 +15,7 @@
     },
     ".claude/rules/behavior-bundle-performance.md": {
       "source": "project",
-      "local_hash": "45d0a075379e7ef8"
+      "local_hash": "c754d94cb26304ed"
     },
     ".claude/rules/behavior-catch-fire-and-forget.md": {
       "source": "forge:js-ts/behavior-catch-fire-and-forget.md",
@@ -29,7 +29,7 @@
     },
     ".claude/rules/behavior-custom-editor-provider.md": {
       "source": "project",
-      "local_hash": "3efc50dc38aae4af"
+      "local_hash": "d5594b7492e52045"
     },
     ".claude/rules/behavior-extract-on-second-copy.md": {
       "source": "forge:core/behavior-extract-on-second-copy.md",
@@ -52,11 +52,12 @@
     },
     ".claude/rules/behavior-mdast-metadata-through-prosemirror.md": {
       "source": "project",
-      "local_hash": "f73e98883e571355"
+      "local_hash": "be550c48bf35fe01"
     },
     ".claude/rules/behavior-milkdown-api-boundary.md": {
       "source": "project",
-      "local_hash": "304ddc9c3821191d"
+      "local_hash": "b04205a82dbdcae2",
+      "note": "ADR-001 (docs/decisions/001-milkdown-wysiwyg-engine.md)"
     },
     ".claude/rules/behavior-no-speculative-config.md": {
       "source": "forge:core/behavior-no-speculative-config.md",
@@ -65,7 +66,7 @@
     },
     ".claude/rules/behavior-round-trip-fidelity.md": {
       "source": "project",
-      "local_hash": "fb967c30edc955db"
+      "local_hash": "878547e312e962fc"
     },
     ".claude/rules/behavior-safe-number-conversion.md": {
       "source": "forge:js-ts/behavior-safe-number-conversion.md",
@@ -79,8 +80,8 @@
     },
     ".claude/rules/behavior-static-boundary-checks.md": {
       "source": "forge:js-ts/behavior-static-boundary-checks.md",
-      "library_hash": "25b034f517594e44",
-      "local_hash": "25b034f517594e44"
+      "library_hash": "8488a64182523d50",
+      "local_hash": "8488a64182523d50"
     },
     ".claude/rules/behavior-teardown-completes-cleanup.md": {
       "source": "forge:core/behavior-teardown-completes-cleanup.md",

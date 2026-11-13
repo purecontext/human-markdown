@@ -4,7 +4,8 @@
   "states": {
     "idle": {
       "transitions": [
-        { "event": "task-picked", "target": "implementing", "action": "/forge:work" }
+        { "event": "task-picked", "target": "implementing", "action": "/forge:work" },
+        { "event": "pr-adopted", "target": "in-review", "action": null }
       ]
     },
     "implementing": {
@@ -17,7 +18,8 @@
     "ready-to-ship": {
       "description": "Implementation done, task closed locally. Ready for shipping pipeline.",
       "transitions": [
-        { "event": "ship-started", "target": "shipping", "action": "/forge:ship" }
+        { "event": "ship-started", "target": "shipping", "action": "/forge:ship" },
+        { "event": "pr-adopted", "target": "in-review", "action": null }
       ]
     },
     "shipping": {
@@ -40,22 +42,27 @@
         { "event": "review-approved", "target": "approved", "action": null },
         { "event": "changes-requested", "target": "iterating", "action": "/forge:iterate" },
         { "event": "escalate", "target": "escalated", "action": null },
-        { "event": "merged", "target": "idle", "action": "/forge:merged" }
+        { "event": "merged", "target": "idle", "action": "/forge:merged" },
+        { "event": "pr-closed", "target": "idle", "action": null }
       ]
     },
     "iterating": {
       "description": "Addressing QA feedback. Reading PR comments, fixing, pushing.",
       "transitions": [
+        { "event": "review-approved", "target": "approved", "action": null },
         { "event": "fixes-pushed", "target": "in-review", "action": null },
         { "event": "iteration-abandoned", "target": "approved", "action": null },
         { "event": "escalate", "target": "escalated", "action": null },
-        { "event": "merged", "target": "idle", "action": "/forge:merged" }
+        { "event": "merged", "target": "idle", "action": "/forge:merged" },
+        { "event": "pr-closed", "target": "idle", "action": null }
       ]
     },
     "approved": {
-      "description": "QA approved (or skipped). PR ready for merge.",
+      "description": "QA approved (or skipped). PR ready for merge; a verification round after a later push can still send it back to iterating.",
       "transitions": [
-        { "event": "merged", "target": "idle", "action": "/forge:merged" }
+        { "event": "changes-requested", "target": "iterating", "action": "/forge:iterate" },
+        { "event": "merged", "target": "idle", "action": "/forge:merged" },
+        { "event": "pr-closed", "target": "idle", "action": null }
       ]
     },
     "escalated": {
@@ -63,7 +70,8 @@
       "transitions": [
         { "event": "user-resolved", "target": "approved", "action": null },
         { "event": "back-to-iterating", "target": "iterating", "action": "/forge:iterate" },
-        { "event": "merged", "target": "idle", "action": "/forge:merged" }
+        { "event": "merged", "target": "idle", "action": "/forge:merged" },
+        { "event": "pr-closed", "target": "idle", "action": null }
       ]
     }
   },

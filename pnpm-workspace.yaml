@@ -1,0 +1,24 @@
+# Build approvals and pnpm settings live here: pnpm 11 and later no longer read
+# package.json's "pnpm" field. allowBuilds is read by pnpm 10.26+ as well.
+allowBuilds:
+  "@vscode/vsce-sign": false
+  "keytar": false
+  "@biomejs/biome": true
+  "esbuild": true
+overrides:
+  "qs@>=6.11.1 <=6.15.1": ">=6.15.2"
+  "tmp@<0.2.6": ">=0.2.6"
+  "fast-uri@>=3.0.0 <3.1.6": ">=3.1.6"
+  "js-yaml@>=4.0.0 <4.3.2": ">=4.3.2"
+  "form-data@<4.0.6": ">=4.0.6"
+  "postcss@>=8.0.0 <8.5.18": ">=8.5.18"
+  "nanoid@>=5.0.0 <5.1.16": ">=5.1.16"
+  "brace-expansion@>=5.0.0 <5.0.9": ">=5.0.9"
+  "linkify-it@>=5.0.0 <5.0.2": ">=5.0.2"
+  "follow-redirects@>=1.16.0 <1.16.1": ">=1.16.1"
+  "markdown-it@>=14.1.0 <14.3.3": ">=14.3.3"
+  "source-map-js@>=1.0.0 <1.2.2": ">=1.2.2"
+auditConfig:
+  "ignoreCves":
+    - "CVE-2026-65901"
+    - "CVE-2026-93687"

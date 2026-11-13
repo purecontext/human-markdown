@@ -48,6 +48,7 @@
       "transitions": [
         { "event": "fixes-pushed", "target": "in-review", "action": null },
         { "event": "iteration-abandoned", "target": "approved", "action": null },
+        { "event": "escalate", "target": "escalated", "action": null },
         { "event": "merged", "target": "idle", "action": "/forge:merged" }
       ]
     },
@@ -58,7 +59,7 @@
       ]
     },
     "escalated": {
-      "description": "QA loop exceeded max rounds, or crucible posted a step-back report. User intervention required.",
+      "description": "The review cap hit a second time on one PR, after the author's one approach and --full, or the review_rounds trigger fired. User intervention required.",
       "transitions": [
         { "event": "user-resolved", "target": "approved", "action": null },
         { "event": "back-to-iterating", "target": "iterating", "action": "/forge:iterate" },

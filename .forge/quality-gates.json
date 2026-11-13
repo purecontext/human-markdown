@@ -1,7 +1,7 @@
 {
   "version": 1,
   "plugin_versions": {
-    "forge": "3.15.0"
+    "forge": "3.16.0"
   },
   "gates": [
     {
@@ -144,7 +144,7 @@
     },
     {
       "id": "dependency-install-scripts",
-      "instruction": "When the diff adds or upgrades a dependency: the lockfile is updated and committed, the version is pinned per tech preferences, and any new install/postinstall script is approved explicitly (pnpm approve-builds or onlyBuiltDependencies) after checking what it runs. Never approve all builds wholesale.",
+      "instruction": "When the diff adds or upgrades a dependency: the lockfile is updated and committed, the version is pinned per tech preferences, and any new install/postinstall script is approved explicitly (`pnpm approve-builds`, or `allowBuilds` in pnpm-workspace.yaml: true to run it, false to skip it) after checking what it runs. Never approve all builds wholesale.",
       "triggers": [
         "next"
       ],

@@ -1,13 +1,14 @@
 {
+  "env": {
+    "PURECONTEXT_AGENT": "builder"
+  },
   "enabledPlugins": {
     "forge@forge-marketplace": true,
     "forge-flow@forge-marketplace": true,
     "crucible@forge-marketplace": true,
     "foundry@forge-marketplace": true,
     "recall@purecontext": true,
-    "git@purecontext": true
-  },
-  "env": {
-    "PURECONTEXT_AGENT": "builder"
+    "git@purecontext": true,
+    "design@forge-marketplace": true
   }
 }
